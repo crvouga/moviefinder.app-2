@@ -27,19 +27,21 @@ viewDocument = \{ pageHref } ->
 
             ],
         Html.body
-            [Attr.class "bg-black text-white flex flex-col items-center justify-center w-full h-[100dvh] max-h-[100dvh]"]
+            [
+                Attr.class "bg-black text-white flex flex-col items-center justify-center w-full h-[100dvh] max-h-[100dvh]",
+            ]
             [
                 Html.div
                     [
                         Attr.class "w-full max-w-[500px] h-full max-h-[800px] border rounded overflow-hidden",
                         Attr.id "app",
-                        Hx.hxBoost "true",
+                        Hx.hxBoost Bool.true,
                     ]
                     [
                         Html.p
                             [
-                                Hx.hxSwap "outerHTML",
-                                Hx.hxTrigger "load",
+                                Hx.hxSwap OuterHtml,
+                                Hx.hxTrigger Load,
                                 Hx.hxGet pageHref,
                             ]
                             [Html.text "Loading..."],
