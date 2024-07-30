@@ -27,7 +27,7 @@ viewDocument = \{ pageHref } ->
 
             ],
         Html.body
-            [Attr.class "bg-black text-white flex flex-col items-center justify-center w-full h-screen"]
+            [Attr.class "bg-black text-white flex flex-col items-center justify-center w-full h-[100dvh] max-h-[100dvh]"]
             [
                 Html.div
                     [
