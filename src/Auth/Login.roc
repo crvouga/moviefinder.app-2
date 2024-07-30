@@ -53,6 +53,9 @@ routeHx = \req ->
 
         "/login/send-code" ->
             _ <- Sleep.millis 1000 |> Task.await
+            "/home" |> Response.redirect |> Task.ok
+
+        "/login/verify-code" ->
             viewVerifyCode |> Response.html |> Task.ok
 
         _ ->
