@@ -1,4 +1,4 @@
-module [hxSwap, hxTrigger, hxGet, hxBoost]
+module [hxSwap, hxTrigger, hxGet, hxBoost, hxTarget]
 
 import Html.Attr as Attr
 
@@ -13,3 +13,6 @@ hxGet = Attr.attribute "hx-get"
 
 hxBoost : Str -> Attr.Attribute
 hxBoost = Attr.attribute "hx-boost"
+
+hxTarget : Str -> Attr.Attribute
+hxTarget = Attr.attribute "hx-target"
