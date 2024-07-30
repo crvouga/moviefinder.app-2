@@ -16,7 +16,6 @@ view = \{ label, inputType ? Text } ->
     Html.div
         [
             Attr.class "w-full flex flex-col gap-2",
-
         ]
         [
             Html.label [Attr.class "font-bold"] [Html.text label],

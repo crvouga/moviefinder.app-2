@@ -56,7 +56,7 @@ viewDocument = \{ pageHref } ->
 routeHx : Http.Request -> Task.Task Http.Response []
 routeHx = \req ->
     when req.url is
-        "/login" | "/login/send-code" ->
+        "/login" | "/login/send-code" | "/login/sent-code" | "/login/verify-code" | "/login/verified-code" ->
             Auth.Login.routeHx req
 
         "/home" ->

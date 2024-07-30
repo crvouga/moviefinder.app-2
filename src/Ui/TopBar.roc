@@ -8,7 +8,6 @@ view = \{ title } ->
     Html.div
         [
             Attr.class "w-full h-16 flex items-center justify-center border-b",
-
         ]
         [
             Html.p [Attr.class "text-lg font-bold"] [Html.text title],
