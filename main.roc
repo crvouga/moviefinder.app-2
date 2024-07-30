@@ -7,18 +7,34 @@ import pf.Task exposing [Task]
 import pf.Http exposing [Request, Response]
 import pf.Utc
 import Html.Html as Html
-import Html.Attribute as Attribute
+import Html.Attribute as Attr
 
 document =
     Html.html [] [
-        Html.body [] [
-            Html.h1 [] [Html.text "Roc"],
-            Html.p [] [
-                Html.text "You should really check out ",
-                Html.a [Attribute.href "https://roc-lang.org/"] [Html.text "Roc"],
-                Html.text "!",
+        Html.head
+            []
+            [
+                Html.title [] [Html.text "moviefinder.app"],
+                Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
             ],
-        ],
+        Html.body
+            [
+                Attr.class "bg-black text-white",
+            ]
+            [
+                Html.h1
+                    [
+                        Attr.class "text-4xl font-bold text-center text-blue-500",
+                    ]
+                    [
+                        Html.text "Movie finder",
+                    ],
+                Html.p [] [
+                    Html.text "You should really check out ",
+                    Html.a [Attr.href "https://roc-lang.org/"] [Html.text "Roc"],
+                    Html.text "!",
+                ],
+            ],
     ]
     |> Html.render
 
