@@ -20,8 +20,11 @@ viewDocument = \{ pageHref } ->
             []
             [
                 Html.title [] [Html.text "moviefinder.app"],
+                Html.meta [Attr.charset "UTF-8"],
+                Html.meta [Attr.name "viewport", Attr.content "width=device-width, initial-scale=1.0"],
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
                 Html.script [Attr.src "https://unpkg.com/htmx.org@2.0.1"] [],
+
             ],
         Html.body
             [Attr.class "bg-black text-white flex flex-col items-center justify-center w-full h-screen"]
