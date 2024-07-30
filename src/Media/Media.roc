@@ -1,7 +1,7 @@
 module [Media, view]
 
 import Html.Html as Html
-import Html.Attribute as Attr
+import Html.Attr as Attr
 
 MediaType : [Movie, Tv]
 

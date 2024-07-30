@@ -7,7 +7,7 @@ import pf.Task exposing [Task]
 import pf.Http exposing [Request, Response]
 import pf.Utc
 import Html.Html as Html
-import Html.Attribute as Attr
+import Html.Attr as Attr
 import Home
 import Media.Media as Media
 import Response

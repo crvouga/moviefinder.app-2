@@ -136,7 +136,7 @@ module [
     template,
 ]
 
-import Html.Attribute exposing [Attribute, attribute]
+import Html.Attr exposing [Attribute, attribute]
 import Html.SafeStr as SafeStr exposing [SafeStr, escape, dangerouslyMarkSafe]
 
 ## An HTML node, either an HTML element or some text inside an HTML element.
