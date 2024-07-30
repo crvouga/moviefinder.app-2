@@ -22,6 +22,10 @@ viewDocument = \{ pageHref } ->
                 Html.title [] [Html.text "moviefinder.app"],
                 Html.meta [Attr.charset "UTF-8"],
                 Html.meta [Attr.name "viewport", Attr.content "width=device-width, initial-scale=1.0"],
+                Html.meta [Attr.name "theme-color", Attr.content "#000000"],
+                # [:link {:rel "icon" :href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><text y='32' font-size='32'>🍿</text></svg>"}]
+                Html.link [Attr.rel "icon", Attr.href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><text y='32' font-size='32'>🍿</text></svg>"],
+                Html.link [Attr.rel "icon", Attr.href "/favicon.ico"],
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
                 Html.script [Attr.src "https://unpkg.com/htmx.org@2.0.1"] [],
 
@@ -35,14 +39,14 @@ viewDocument = \{ pageHref } ->
                     [
                         Attr.class "w-full max-w-[500px] h-full max-h-[800px] border rounded overflow-hidden",
                         Attr.id "app",
-                        Hx.hxBoost Bool.true,
+                        Hx.boost Bool.true,
                     ]
                     [
                         Html.p
                             [
-                                Hx.hxSwap OuterHtml,
-                                Hx.hxTrigger Load,
-                                Hx.hxGet pageHref,
+                                Hx.swap OuterHtml,
+                                Hx.trigger Load,
+                                Hx.get pageHref,
                             ]
                             [Html.text "Loading..."],
                     ],
@@ -59,7 +63,7 @@ routeHx = \req ->
             Media.view |> Response.html |> Task.ok
 
         _ ->
-            Home.view |> Response.html |> Task.ok
+            "/home" |> Response.redirect |> Task.ok
 
 toDefaultRoute : Http.Request -> Str
 toDefaultRoute = \req ->
@@ -72,12 +76,16 @@ toDefaultRoute = \req ->
 
 routeReq : Http.Request -> Task.Task Http.Response []
 routeReq = \req ->
-    req
-    |> toDefaultRoute
-    |> \pageHref -> { pageHref }
-    |> viewDocument
-    |> Response.html
-    |> Task.ok
+    when req.url is
+        # "/favicon.ico" ->
+        #     Html.text "" |> Response.html |> Task.ok
+        _ ->
+            req
+            |> toDefaultRoute
+            |> \pageHref -> { pageHref }
+            |> viewDocument
+            |> Response.html
+            |> Task.ok
 
 main : Http.Request -> Task.Task Http.Response []
 main = \req ->

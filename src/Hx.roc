@@ -1,25 +1,25 @@
-module [hxSwap, hxTrigger, hxGet, hxBoost, hxTarget]
+module [swap, trigger, get, boost, target]
 
 import Html.Attr as Attr
 
-HxSwapValue : [InnerHtml, OuterHtml, InnerText, OuterText]
+SwapValue : [InnerHtml, OuterHtml, InnerText, OuterText]
 
-hxSwapValueToStr : HxSwapValue -> Str
-hxSwapValueToStr = \hxSwapValue ->
-    when hxSwapValue is
+swapValueToStr : SwapValue -> Str
+swapValueToStr = \swapValue ->
+    when swapValue is
         InnerHtml -> "innerHTML"
         OuterHtml -> "outerHTML"
         InnerText -> "innerText"
         OuterText -> "outerText"
 
-hxSwap : HxSwapValue -> Attr.Attribute
-hxSwap = \hxSwapValue -> hxSwapValue |> hxSwapValueToStr |> (Attr.attribute "hx-swap")
+swap : SwapValue -> Attr.Attribute
+swap = \swapValue -> swapValue |> swapValueToStr |> (Attr.attribute "hx-swap")
 
-HxTriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress]
+TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress]
 
-hxTriggerValueToStr : HxTriggerValue -> Str
-hxTriggerValueToStr = \hxTriggerValue ->
-    when hxTriggerValue is
+triggerValueToStr : TriggerValue -> Str
+triggerValueToStr = \triggerValue ->
+    when triggerValue is
         Load -> "load"
         Click -> "click"
         Submit -> "submit"
@@ -29,11 +29,11 @@ hxTriggerValueToStr = \hxTriggerValue ->
         Keydown -> "keydown"
         Keypress -> "keypress"
 
-hxTrigger : HxTriggerValue -> Attr.Attribute
-hxTrigger = \hxTriggerValue -> hxTriggerValue |> hxTriggerValueToStr |> (Attr.attribute "hx-trigger")
+trigger : TriggerValue -> Attr.Attribute
+trigger = \triggerValue -> triggerValue |> triggerValueToStr |> (Attr.attribute "hx-trigger")
 
-hxGet : Str -> Attr.Attribute
-hxGet = Attr.attribute "hx-get"
+get : Str -> Attr.Attribute
+get = Attr.attribute "hx-get"
 
 boolToHtmlBool : Bool.Bool -> Str
 boolToHtmlBool = \bool ->
@@ -42,8 +42,8 @@ boolToHtmlBool = \bool ->
     else
         "false"
 
-hxBoost : Bool -> Attr.Attribute
-hxBoost = \bool -> bool |> boolToHtmlBool |> (Attr.attribute "hx-boost")
+boost : Bool -> Attr.Attribute
+boost = \bool -> bool |> boolToHtmlBool |> (Attr.attribute "hx-boost")
 
-hxTarget : Str -> Attr.Attribute
-hxTarget = Attr.attribute "hx-target"
+target : Str -> Attr.Attribute
+target = Attr.attribute "hx-target"

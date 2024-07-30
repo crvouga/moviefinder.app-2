@@ -8,9 +8,9 @@ view : { label : Str, href : Str } -> Html.Node
 view = \{ label, href } ->
     Html.a
         [
-            Attr.class "px-4 py-2 bg-blue-500 text-white rounded font-bold",
+            Attr.class "px-4 py-3 bg-blue-600 text-lg text-white rounded font-bold hover:opacity-90 active:opacity-80",
             Attr.href href,
-            Hx.hxTarget "#app",
+            Hx.target "#app",
 
         ]
         [Html.text label]
