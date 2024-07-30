@@ -47,10 +47,10 @@ routeHx : Request -> Task Response []
 routeHx = \req ->
     when req.url is
         "/home" ->
-            Response.html Home.view |> Task.ok
+            Home.view |> Response.html |> Task.ok
 
         "/media" ->
-            Response.html Media.view |> Task.ok
+            Media.view |> Response.html |> Task.ok
 
         _ ->
             { pageHref: req.url } |> viewDocument |> Response.html |> Task.ok
