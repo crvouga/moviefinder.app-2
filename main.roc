@@ -6,6 +6,21 @@ import pf.Stdout
 import pf.Task exposing [Task]
 import pf.Http exposing [Request, Response]
 import pf.Utc
+import Html.Html as Html
+import Html.Attribute as Attribute
+
+document =
+    Html.html [] [
+        Html.body [] [
+            Html.h1 [] [Html.text "Roc"],
+            Html.p [] [
+                Html.text "You should really check out ",
+                Html.a [Attribute.href "https://roc-lang.org/"] [Html.text "Roc"],
+                Html.text "!",
+            ],
+        ],
+    ]
+    |> Html.render
 
 main : Request -> Task Response []
 main = \req ->
@@ -16,5 +31,5 @@ main = \req ->
     Task.ok {
         status: 200,
         headers: [],
-        body: Str.toUtf8 "<b>Hello, world!</b>\n",
+        body: Str.toUtf8 document,
     }
