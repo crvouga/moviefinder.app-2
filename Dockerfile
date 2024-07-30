@@ -39,4 +39,4 @@ RUN ${ROC_DIR}/roc version || echo "Roc version command failed"
 
 WORKDIR /app
 
-CMD ["roc", "run", "src/main.roc"]
+CMD ["roc", "run", "src/Main.roc"]
