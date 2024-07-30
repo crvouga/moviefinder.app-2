@@ -54,7 +54,7 @@ routeHx = \req ->
             Media.view |> Response.html |> Task.ok
 
         _ ->
-            { pageHref: req.url } |> viewDocument |> Response.html |> Task.ok
+            Home.view |> Response.html |> Task.ok
 
 toDefaultRoute : Http.Request -> Str
 toDefaultRoute = \req ->
