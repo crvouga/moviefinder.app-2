@@ -1,8 +1,8 @@
-module [Query, SortDirection]
+module [Query, OrderBy, OrderByDirection, WhereClause, WhereOperation, Value]
 
-SortDirection : [Asc, Desc]
+OrderByDirection : [Asc, Desc]
 
-Query field value : {
+Query field : {
     limit : Int,
     offset : Int,
     orderBy : OrderBy field,
@@ -11,12 +11,12 @@ Query field value : {
 
 OrderBy field : {
     field : field,
-    direction : SortDirection,
+    direction : OrderByDirection,
 }
 
 Value : [Str, Int, Bool]
 
-(Where field) = List (WhereClause field)
+Where field : List (WhereClause field)
 
 WhereOperation : [Eq, Neq, Gt, Gte, Lt, Lte, In, Like, And, Or]
 
