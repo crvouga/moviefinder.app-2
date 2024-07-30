@@ -12,8 +12,8 @@ import Home
 import Media
 import Response
 
-document : Html.Node
-document =
+viewDocument : { pageHref : Str } -> Html.Node
+viewDocument = \{ pageHref } ->
     Html.html [] [
         Html.head
             []
@@ -36,7 +36,7 @@ document =
                             [
                                 (Attr.attribute "hx-swap") "outerHTML",
                                 (Attr.attribute "hx-trigger") "load",
-                                (Attr.attribute "hx-get") "/home",
+                                (Attr.attribute "hx-get") pageHref,
                             ]
                             [Html.text "Loading..."],
                     ],
@@ -53,11 +53,11 @@ routeHx = \req ->
             Response.html Media.view |> Task.ok
 
         _ ->
-            Response.html document |> Task.ok
+            { pageHref: req.url } |> viewDocument |> Response.html |> Task.ok
 
 routeReq : Request -> Task Response []
-routeReq = \_req ->
-    Response.html document |> Task.ok
+routeReq = \req ->
+    { pageHref: req.url } |> viewDocument |> Response.html |> Task.ok
 
 main : Request -> Task Response []
 main = \req ->
