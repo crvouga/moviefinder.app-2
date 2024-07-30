@@ -1,16 +1,17 @@
 app [main] {
-    pf: platform "https://github.com/roc-lang/basic-webserver/releases/download/0.4.0/iAiYpbs5zdVB75golcg_YMtgexN3e2fwhsYPLPCeGzk.tar.br",
+    pf: platform "https://github.com/roc-lang/basic-webserver/releases/download/0.5.0/Vq-iXfrRf-aHxhJpAh71uoVUlC-rsWvmjzTYOJKhu4M.tar.br",
 }
 
 import pf.Stdout
-import pf.Task exposing [Task]
-import pf.Http exposing [Request, Response]
+import pf.Task
+import pf.Http
 import pf.Utc
 import Html.Html as Html
 import Html.Attr as Attr
 import Home
 import Media.Media as Media
 import Response
+import Hx
 
 viewDocument : { pageHref : Str } -> Html.Node
 viewDocument = \{ pageHref } ->
@@ -29,21 +30,21 @@ viewDocument = \{ pageHref } ->
                     [
                         Attr.class "w-full max-w-[500px] h-full max-h-[800px] border rounded overflow-hidden",
                         Attr.id "app",
-                        (Attr.attribute "hx-boost") "true",
+                        Hx.hxBoost "true",
                     ]
                     [
                         Html.p
                             [
-                                (Attr.attribute "hx-swap") "outerHTML",
-                                (Attr.attribute "hx-trigger") "load",
-                                (Attr.attribute "hx-get") pageHref,
+                                Hx.hxSwap "outerHTML",
+                                Hx.hxTrigger "load",
+                                Hx.hxGet pageHref,
                             ]
                             [Html.text "Loading..."],
                     ],
             ],
     ]
 
-routeHx : Request -> Task Response []
+routeHx : Http.Request -> Task.Task Http.Response []
 routeHx = \req ->
     when req.url is
         "/home" ->
@@ -55,18 +56,25 @@ routeHx = \req ->
         _ ->
             { pageHref: req.url } |> viewDocument |> Response.html |> Task.ok
 
-routeReq : Request -> Task Response []
-routeReq = \req ->
-    pageHref =
-        if
-            req.url == "/"
-        then
-            "/home"
-        else
-            req.url
-    { pageHref: pageHref } |> viewDocument |> Response.html |> Task.ok
+toDefaultRoute : Http.Request -> Str
+toDefaultRoute = \req ->
+    if
+        req.url == "/"
+    then
+        "/home"
+    else
+        req.url
 
-main : Request -> Task Response []
+routeReq : Http.Request -> Task.Task Http.Response []
+routeReq = \req ->
+    req
+    |> toDefaultRoute
+    |> \pageHref -> { pageHref }
+    |> viewDocument
+    |> Response.html
+    |> Task.ok
+
+main : Http.Request -> Task.Task Http.Response []
 main = \req ->
 
     date = Utc.now! |> Utc.toIso8601Str
