@@ -10,3 +10,8 @@ build:
 # Run the Docker container
 run:
 	docker run --platform linux/amd64 --rm $(IMAGE_NAME)
+
+
+
+# make build
+# make run
