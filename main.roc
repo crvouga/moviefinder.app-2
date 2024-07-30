@@ -8,6 +8,7 @@ import pf.Http exposing [Request, Response]
 import pf.Utc
 import Html.Html as Html
 import Html.Attribute as Attr
+import Home
 
 document =
     Html.html [] [
@@ -18,23 +19,8 @@ document =
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
             ],
         Html.body
-            [
-                Attr.class "bg-black text-white",
-            ]
-            [
-                Html.h1
-                    [
-                        Attr.class "text-4xl font-bold text-center text-blue-500",
-                    ]
-                    [
-                        Html.text "Movie finder",
-                    ],
-                Html.p [] [
-                    Html.text "You should really check out ",
-                    Html.a [Attr.href "https://roc-lang.org/"] [Html.text "Roc"],
-                    Html.text "!",
-                ],
-            ],
+            [Attr.class "bg-black text-white flex flex-col items-center justify-center w-full h-screen"]
+            [Html.div [Attr.class "w-full max-w-[500px] h-full max-h-[800px] border rounded overflow-hidden"] [Home.view]],
     ]
     |> Html.render
 
