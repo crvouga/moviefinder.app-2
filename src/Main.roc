@@ -11,6 +11,7 @@ import Html.Attr as Attr
 import Home
 import Media.Media as Media
 import Response
+import Auth.Login
 import Hx
 
 viewDocument : { pageHref : Str } -> Html.Node
@@ -23,7 +24,6 @@ viewDocument = \{ pageHref } ->
                 Html.meta [Attr.charset "UTF-8"],
                 Html.meta [Attr.name "viewport", Attr.content "width=device-width, initial-scale=1.0"],
                 Html.meta [Attr.name "theme-color", Attr.content "#000000"],
-                # [:link {:rel "icon" :href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><text y='32' font-size='32'>🍿</text></svg>"}]
                 Html.link [Attr.rel "icon", Attr.href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><text y='32' font-size='32'>🍿</text></svg>"],
                 Html.link [Attr.rel "icon", Attr.href "/favicon.ico"],
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
@@ -56,6 +56,9 @@ viewDocument = \{ pageHref } ->
 routeHx : Http.Request -> Task.Task Http.Response []
 routeHx = \req ->
     when req.url is
+        "/login" | "/login/send-code" ->
+            Auth.Login.routeHx req
+
         "/home" ->
             Home.view |> Response.html |> Task.ok
 
