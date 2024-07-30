@@ -1,4 +1,4 @@
-module [routeHx]
+module [routeHx, strToRoute, Route]
 
 import pf.Task
 import pf.Http
@@ -11,14 +11,15 @@ import Ui.TextField as TextField
 import Ui.Button as Button
 import Ui.Typography as Typography
 
-Route : [SendCode, SentCode, VerifyCode, VerifiedCode, Unknown]
+Route : [SendCode, ClickedSendCode, VerifyCode, ClickedVerifyCode, VerifiedCode, Unknown]
 
 strToRoute : Str -> Route
 strToRoute = \str ->
     when str is
         "/login" -> SendCode
-        "/login/send-code" -> SentCode
+        "/login/clicked-send-code" -> ClickedSendCode
         "/login/verify-code" -> VerifyCode
+        "/login/clicked-verify-code" -> ClickedVerifyCode
         "/login/verified-code" -> VerifiedCode
         _ -> Unknown
 
@@ -26,8 +27,9 @@ routeToStr : Route -> Str
 routeToStr = \route ->
     when route is
         SendCode -> "/login"
-        SentCode -> "/login/send-code"
+        ClickedSendCode -> "/login/clicked-send-code"
         VerifyCode -> "/login/verify-code"
+        ClickedVerifyCode -> "/login/clicked-verify-code"
         VerifiedCode -> "/login/verified-code"
         Unknown -> "/"
 
@@ -44,7 +46,7 @@ viewSendCode = Html.div
             ]
             [
                 TextField.view { label: "Phone number" },
-                Button.view { label: "Send code", href: routeToStr SendCode },
+                Button.view { label: "Send code", href: routeToStr ClickedSendCode },
             ],
     ]
 
@@ -62,7 +64,7 @@ viewVerifyCode = Html.div
             [
                 Typography.view { text: "Enter the code sent to your phone" },
                 TextField.view { label: "Code" },
-                Button.view { label: "Verify code", href: routeToStr VerifyCode },
+                Button.view { label: "Verify code", href: routeToStr ClickedVerifyCode },
             ],
     ]
 
@@ -86,17 +88,17 @@ viewVerifiedCode = Html.div
 routeHx : Http.Request -> Task.Task Http.Response []
 routeHx = \req ->
     when strToRoute req.url is
-        Login ->
+        SendCode ->
             viewSendCode |> Response.html |> Task.ok
 
-        SendCode ->
+        ClickedSendCode ->
             _ <- Sleep.millis 1000 |> Task.await
-            SentCode |> routeToStr |> Response.redirect |> Task.ok
-
-        SentCode ->
-            viewVerifyCode |> Response.html |> Task.ok
+            VerifyCode |> routeToStr |> Response.redirect |> Task.ok
 
         VerifyCode ->
+            viewVerifyCode |> Response.html |> Task.ok
+
+        ClickedVerifyCode ->
             _ <- Sleep.millis 1000 |> Task.await
             VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
 

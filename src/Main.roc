@@ -53,19 +53,32 @@ viewDocument = \{ pageHref } ->
             ],
     ]
 
+Route : [Home, Media, Login Auth.Login.Route, Unknown]
+
+strToRoute : Str -> Route
+strToRoute = \str ->
+    loginRoute = Auth.Login.strToRoute str
+    if loginRoute == Unknown then
+        when str is
+            "/home" -> Home
+            "/media" -> Media
+            _ -> Unknown
+    else
+        Login loginRoute
+
 routeHx : Http.Request -> Task.Task Http.Response []
 routeHx = \req ->
-    when req.url is
-        "/login" | "/login/send-code" | "/login/sent-code" | "/login/verify-code" | "/login/verified-code" ->
+    when strToRoute req.url is
+        Login _ ->
             Auth.Login.routeHx req
 
-        "/home" ->
+        Home ->
             Home.view |> Response.html |> Task.ok
 
-        "/media" ->
+        Media ->
             Media.view |> Response.html |> Task.ok
 
-        _ ->
+        Unknown ->
             "/home" |> Response.redirect |> Task.ok
 
 toDefaultRoute : Http.Request -> Str
