@@ -16,7 +16,7 @@ OrderBy field : {
 
 Value : [Str, Int, Bool]
 
-Where field = List (WhereClause field)
+(Where field) = List (WhereClause field)
 
 WhereOperation : [Eq, Neq, Gt, Gte, Lt, Lte, In, Like, And, Or]
 
@@ -26,13 +26,11 @@ WhereClause field : {
     value : Value,
 }
 
-
-
-# 
-# 
-# 
-# 
-# 
+#
+#
+#
+#
+#
 
 TodoField : [Id, Title, Completed]
 
@@ -44,7 +42,7 @@ todoQuery = {
         field: Id,
         direction: Asc,
     },
-    where:  {
+    where: {
         combine: And,
         clauses: [
             {
@@ -53,5 +51,5 @@ todoQuery = {
                 value: Bool False,
             },
         ],
-    }
+    },
 }

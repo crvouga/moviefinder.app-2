@@ -1,9 +1,16 @@
-module [view]
+module [Media, view]
 
 import Html.Html as Html
 import Html.Attribute as Attr
 
+MediaType : [Movie, Tv]
 
+Media : {
+    mediaTitle : Str,
+    mediaDescription : Str,
+    mediaType : MediaType,
+    mediaPosterUrl : Str,
+}
 
 view : Html.Node
 view = Html.div [] [

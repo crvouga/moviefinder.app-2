@@ -9,7 +9,7 @@ import pf.Utc
 import Html.Html as Html
 import Html.Attribute as Attr
 import Home
-import Media
+import Media.Media as Media
 import Response
 
 viewDocument : { pageHref : Str } -> Html.Node
@@ -57,7 +57,14 @@ routeHx = \req ->
 
 routeReq : Request -> Task Response []
 routeReq = \req ->
-    { pageHref: req.url } |> viewDocument |> Response.html |> Task.ok
+    pageHref =
+        if
+            req.url == "/"
+        then
+            "/home"
+        else
+            req.url
+    { pageHref: pageHref } |> viewDocument |> Response.html |> Task.ok
 
 main : Request -> Task Response []
 main = \req ->
