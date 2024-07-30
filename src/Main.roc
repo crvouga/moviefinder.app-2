@@ -77,8 +77,9 @@ toDefaultRoute = \req ->
 routeReq : Http.Request -> Task.Task Http.Response []
 routeReq = \req ->
     when req.url is
-        # "/favicon.ico" ->
-        #     Html.text "" |> Response.html |> Task.ok
+        "/favicon.ico" ->
+            Html.text "" |> Response.html |> Task.ok
+
         _ ->
             req
             |> toDefaultRoute
