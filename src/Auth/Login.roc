@@ -102,14 +102,14 @@ routeHx = \ctx, req ->
             viewVerifyCode |> Response.html |> Task.ok
 
         ClickedVerifyCode ->
-            verifiedCode = 
+            responseOk = 
                 VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
             
             task =
                 ctx.verifySms.verifyCode! { phone: "123", code: "123" }
-                verifiedCode
-                
-            task |> Task.onErr \_ -> verifiedCode
+                responseOk
+
+            task |> Task.onErr \_ -> responseOk
             
 
         VerifiedCode ->
