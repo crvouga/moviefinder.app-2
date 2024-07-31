@@ -28,7 +28,7 @@ viewDocument = \{ pageHref } ->
                 Html.meta [Attr.name "description", Attr.content "Find movies and TV shows to watch."],
                 Html.meta [Attr.name "theme-color", Attr.content "#000000"],
                 Html.link [Attr.rel "icon", Attr.href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><text y='32' font-size='32'>🍿</text></svg>"],
-                Html.link [Attr.rel "icon", Attr.href "/favicon.ico"],
+                # Html.link [Attr.rel "icon", Attr.href "/favicon.ico"],
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
                 Html.script [Attr.src "https://unpkg.com/htmx.org@2.0.1", Attr.defer "true"] [],
 
