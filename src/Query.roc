@@ -53,3 +53,37 @@ todoQuery = {
         ],
     },
 }
+
+# 
+# 
+# 
+# 
+
+
+MediaField : [Id, Title, Genre, Year, Rating]
+
+mediaQuery : Query MediaField
+mediaQuery = {
+    limit: 10,
+    offset: 0,
+    orderBy: {
+        field: Rating,
+        direction: Desc,
+    },
+    where: {
+        combine: And,
+        clauses: [
+            {
+                operation: Gt,
+                field: Rating,
+                value: Int 5,
+            },
+            {
+                operation: In,
+                field: Genre,
+                value: Str "Action",
+            },
+        ],
+    },
+}
+
