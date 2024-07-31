@@ -10,6 +10,7 @@ import Ui.TextField as TextField
 import Ui.Button as Button
 import Ui.Typography as Typography
 import Ctx
+import Auth.VerifySms.VerifySms as VerifySms
 
 Route : [SendCode, ClickedSendCode, VerifyCode, ClickedVerifyCode, VerifiedCode, Unknown]
 
@@ -50,8 +51,23 @@ viewSendCode = Html.div
             ],
     ]
 
-viewVerifyCode : Html.Node
-viewVerifyCode = Html.div
+
+ViewVerifyCodeErr : [VerifyCodeErr VerifySms.VerifyCodeErr, None]
+
+
+viewVerifyCodeErr : ViewVerifyCodeErr -> Html.Node
+viewVerifyCodeErr = \viewErr ->
+    when viewErr is
+        None -> 
+            Html.div [] []
+            
+        VerifyCodeErr err -> 
+            Typography.view { text: VerifySms.verifyCodeErrToStr err }
+
+
+viewVerifyCode : {err ? ViewVerifyCodeErr} -> Html.Node
+viewVerifyCode = \{err ? None}  -> 
+    Html.div
     [
         Attr.class "w-full h-full flex flex-col",
     ]
@@ -65,6 +81,7 @@ viewVerifyCode = Html.div
                 Typography.view { text: "Enter the code sent to your phone" },
                 TextField.view { label: "Code", inputType: Tel },
                 Button.view { label: "Verify code", href: routeToStr ClickedVerifyCode },
+                viewVerifyCodeErr err,
             ],
     ]
 
@@ -85,6 +102,20 @@ viewVerifiedCode = Html.div
             ],
     ]
 
+onVerifyCode : Ctx.Ctx -> Task.Task Http.Response VerifySms.VerifyCodeErr
+onVerifyCode = \ctx ->
+    _ <- ctx.verifySms.verifyCode { phone: "123", code: "123" } |> Task.await
+    VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
+
+onVerifyCodeErr : VerifySms.VerifyCodeErr -> Task.Task Http.Response []
+onVerifyCodeErr = \err ->
+    viewVerifyCode {err: VerifyCodeErr err} |> Response.html |> Task.ok
+
+
+clickedVerifyCode : Ctx.Ctx -> Task.Task Http.Response []
+clickedVerifyCode = \ctx ->
+    onVerifyCode ctx |> Task.onErr onVerifyCodeErr
+
 routeHx : Ctx.Ctx, Http.Request -> Task.Task Http.Response []
 routeHx = \ctx, req ->
     when strToRoute req.url is
@@ -96,11 +127,10 @@ routeHx = \ctx, req ->
             VerifyCode |> routeToStr |> Response.redirect |> Task.ok
 
         VerifyCode ->
-            viewVerifyCode |> Response.html |> Task.ok
+            viewVerifyCode { err: None } |> Response.html |> Task.ok
 
         ClickedVerifyCode ->
-            _ <- ctx.verifySms.verifyCode { phone: "123", code: "123" } |> Task.await
-            VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
+            clickedVerifyCode ctx
 
         VerifiedCode ->
             viewVerifiedCode |> Response.html |> Task.ok
