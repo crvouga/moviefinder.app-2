@@ -1,6 +1,7 @@
-module [swap, trigger, get, boost, target]
+module [swap, trigger, get, boost, target, isReq]
 
 import Html.Attr as Attr
+import pf.Http
 
 SwapValue : [InnerHtml, OuterHtml, InnerText, OuterText]
 
@@ -47,3 +48,6 @@ boost = \bool -> bool |> boolToHtmlBool |> (Attr.attribute "hx-boost")
 
 target : Str -> Attr.Attribute
 target = Attr.attribute "hx-target"
+
+isReq : Http.Request -> Bool
+isReq = \req -> List.any req.headers (\header -> header.name == "hx-request")

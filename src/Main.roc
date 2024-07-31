@@ -93,17 +93,12 @@ toDefaultRoute = \req ->
 
 routeReq : Http.Request -> Task.Task Http.Response []
 routeReq = \req ->
-    when req.url is
-        "/favicon.ico" ->
-            Html.text "" |> Response.html |> Task.ok
-
-        _ ->
-            req
-            |> toDefaultRoute
-            |> \pageHref -> { pageHref }
-            |> viewDocument
-            |> Response.html
-            |> Task.ok
+    req
+    |> toDefaultRoute
+    |> \pageHref -> { pageHref }
+    |> viewDocument
+    |> Response.html
+    |> Task.ok
 
 main : Http.Request -> Task.Task Http.Response []
 main = \req ->
@@ -111,9 +106,7 @@ main = \req ->
     date = Utc.now! |> Utc.toIso8601Str
     Stdout.line! "$(date) $(Http.methodToStr req.method) $(req.url)"
 
-    isHxRequest = List.any req.headers (\header -> header.name == "hx-request")
-
-    if isHxRequest then
+    if Hx.isReq req then
         routeHx Ctx.init req
     else
         routeReq req
