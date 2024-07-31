@@ -13,6 +13,7 @@ import Media.Media as Media
 import Response
 import Auth.Login
 import Hx
+import Ctx
 
 viewDocument : { pageHref : Str } -> Html.Node
 viewDocument = \{ pageHref } ->
@@ -66,11 +67,11 @@ strToRoute = \str ->
     else
         Login loginRoute
 
-routeHx : Http.Request -> Task.Task Http.Response []
-routeHx = \req ->
+routeHx : Ctx.Ctx, Http.Request -> Task.Task Http.Response []
+routeHx = \ctx, req ->
     when strToRoute req.url is
         Login _ ->
-            Auth.Login.routeHx req
+            Auth.Login.routeHx ctx req
 
         Home ->
             Home.view |> Response.html |> Task.ok
@@ -113,6 +114,6 @@ main = \req ->
     isHxRequest = List.any req.headers (\header -> header.name == "hx-request")
 
     if isHxRequest then
-        routeHx req
+        routeHx Ctx.init req
     else
         routeReq req

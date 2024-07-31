@@ -2,7 +2,6 @@ module [routeHx, strToRoute, Route]
 
 import pf.Task
 import pf.Http
-import pf.Sleep
 import Response
 import Html.Html as Html
 import Html.Attr as Attr
@@ -10,6 +9,7 @@ import Ui.TopBar as TopBar
 import Ui.TextField as TextField
 import Ui.Button as Button
 import Ui.Typography as Typography
+import Ctx
 
 Route : [SendCode, ClickedSendCode, VerifyCode, ClickedVerifyCode, VerifiedCode, Unknown]
 
@@ -85,21 +85,21 @@ viewVerifiedCode = Html.div
             ],
     ]
 
-routeHx : Http.Request -> Task.Task Http.Response []
-routeHx = \req ->
+routeHx : Ctx.Ctx, Http.Request -> Task.Task Http.Response []
+routeHx = \ctx, req ->
     when strToRoute req.url is
         SendCode ->
             viewSendCode |> Response.html |> Task.ok
 
         ClickedSendCode ->
-            _ <- Sleep.millis 1000 |> Task.await
+            _ <- ctx.verifySms.sendCode { phone: "123" } |> Task.await
             VerifyCode |> routeToStr |> Response.redirect |> Task.ok
 
         VerifyCode ->
             viewVerifyCode |> Response.html |> Task.ok
 
         ClickedVerifyCode ->
-            _ <- Sleep.millis 1000 |> Task.await
+            _ <- ctx.verifySms.verifyCode { phone: "123", code: "123" } |> Task.await
             VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
 
         VerifiedCode ->

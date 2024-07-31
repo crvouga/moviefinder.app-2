@@ -19,7 +19,8 @@ redirect : Str -> Response
 redirect = \location -> {
     status: 302,
     headers: [
-        { name: "HX-Redirect", value: Str.toUtf8 location },
+        { name: "Location", value: Str.toUtf8 location },
+        { name: "Hx-Push-Url", value: Str.toUtf8 location },
     ],
     body: Str.toUtf8 "",
 }
