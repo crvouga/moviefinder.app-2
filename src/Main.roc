@@ -14,6 +14,7 @@ import Response
 import Auth.Login
 import Hx
 import Ctx
+import Ui.Spinner as Spinner
 
 viewDocument : { pageHref : Str } -> Html.Node
 viewDocument = \{ pageHref } ->
@@ -43,13 +44,16 @@ viewDocument = \{ pageHref } ->
                         Hx.boost Bool.true,
                     ]
                     [
-                        Html.p
+                        Html.div
                             [
+                                Attr.class "flex items-center justify-center w-full h-full",
                                 Hx.swap OuterHtml,
                                 Hx.trigger Load,
                                 Hx.get pageHref,
                             ]
-                            [Html.text "Loading..."],
+                            [
+                                Spinner.view,
+                            ],
                     ],
             ],
     ]
@@ -95,8 +99,7 @@ routeReq : Http.Request -> Task.Task Http.Response []
 routeReq = \req ->
     req
     |> toDefaultRoute
-    |> \pageHref -> { pageHref }
-    |> viewDocument
+    |> \pageHref -> viewDocument { pageHref }
     |> Response.html
     |> Task.ok
 

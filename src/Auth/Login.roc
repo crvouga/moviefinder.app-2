@@ -45,7 +45,7 @@ viewSendCode = Html.div
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
             ]
             [
-                TextField.view { label: "Phone number" },
+                TextField.view { label: "Phone number", inputType: Tel },
                 Button.view { label: "Send code", href: routeToStr ClickedSendCode },
             ],
     ]
@@ -63,7 +63,7 @@ viewVerifyCode = Html.div
             ]
             [
                 Typography.view { text: "Enter the code sent to your phone" },
-                TextField.view { label: "Code" },
+                TextField.view { label: "Code", inputType: Tel },
                 Button.view { label: "Verify code", href: routeToStr ClickedVerifyCode },
             ],
     ]
