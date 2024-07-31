@@ -1,18 +1,11 @@
-module [VerifySms, SendCode, VerifyCode, VerifyCodeErr, verifyCodeErrToStr]
+module [VerifySms, SendCode, VerifyCode]
 
 import pf.Task
+# import Auth.VerifySms.VerifyCodeErr exposing [VerifyCodeErr]
 
 SendCode : { phone : Str } -> Task.Task {} []
 
-VerifyCodeErr : [WrongCode, ExpiredCode]
-
-verifyCodeErrToStr : VerifyCodeErr -> Str
-verifyCodeErrToStr = \err ->
-    when err is
-        WrongCode -> "Wrong code"
-        ExpiredCode -> "Expired code"
-
-VerifyCode : { phone : Str, code : Str } -> Task.Task {} VerifyCodeErr
+VerifyCode : { phone : Str, code : Str } -> Task.Task {} []
 
 VerifySms : {
     sendCode : SendCode,
