@@ -1,6 +1,7 @@
 module [
     html,
     redirect,
+    text,
 ]
 
 import pf.Http exposing [Response]
@@ -13,6 +14,15 @@ html = \body -> {
         { name: "Content-Type", value: Str.toUtf8 "text/html; charset=utf-8" },
     ],
     body: body |> Html.render |> Str.toUtf8,
+}
+
+text : Str -> Response
+text = \body -> {
+    status: 200,
+    headers: [
+        { name: "Content-Type", value: Str.toUtf8 "text/plain; charset=utf-8" },
+    ],
+    body: Str.toUtf8 body,
 }
 
 redirect : Str -> Response
