@@ -1,4 +1,4 @@
 .lsp
 .clj*
 .env
-./src/Main
+src/Main
