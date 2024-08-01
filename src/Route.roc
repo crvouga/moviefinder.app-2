@@ -3,10 +3,10 @@ import Auth.Login.Route
 import Feed.Route
 
 Route : [
+    Index,
+    RobotsTxt,
     Login Auth.Login.Route.Route,
     Feed Feed.Route.Route,
-    RobotsTxt,
-    Index,
 ]
 
 init : Route

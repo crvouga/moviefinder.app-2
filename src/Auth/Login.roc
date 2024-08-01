@@ -11,6 +11,32 @@ import Ui.Typography as Typography
 import Ctx
 import Auth.Login.Route
 
+routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response []
+routeHx = \ctx, route ->
+    when route is
+        SendCode ->
+            viewSendCode |> Response.html |> Task.ok
+
+        ClickedSendCode ->
+            ctx.verifySms.sendCode! { phone: "123" }
+            Login VerifyCode |> Response.redirect |> Task.ok
+
+        VerifyCode ->
+            viewVerifyCode |> Response.html |> Task.ok
+
+        ClickedVerifyCode ->
+            responseOk =
+                Login VerifiedCode |> Response.redirect |> Task.ok
+
+            task =
+                ctx.verifySms.verifyCode! { phone: "123", code: "123" }
+                responseOk
+
+            task |> Task.onErr \_ -> responseOk
+
+        VerifiedCode ->
+            viewVerifiedCode |> Response.html |> Task.ok
+
 viewSendCode : Html.Node
 viewSendCode = Html.div
     [
@@ -62,29 +88,3 @@ viewVerifiedCode = Html.div
                 Button.view { label: "Go home", href: "/home" },
             ],
     ]
-
-routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response []
-routeHx = \ctx, route ->
-    when route is
-        SendCode ->
-            viewSendCode |> Response.html |> Task.ok
-
-        ClickedSendCode ->
-            ctx.verifySms.sendCode! { phone: "123" }
-            Login VerifyCode |> Response.redirect |> Task.ok
-
-        VerifyCode ->
-            viewVerifyCode |> Response.html |> Task.ok
-
-        ClickedVerifyCode ->
-            responseOk =
-                Login VerifiedCode |> Response.redirect |> Task.ok
-
-            task =
-                ctx.verifySms.verifyCode! { phone: "123", code: "123" }
-                responseOk
-
-            task |> Task.onErr \_ -> responseOk
-
-        VerifiedCode ->
-            viewVerifiedCode |> Response.html |> Task.ok

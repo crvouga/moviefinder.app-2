@@ -2,10 +2,8 @@ app [main] {
     pf: platform "https://github.com/roc-lang/basic-webserver/releases/download/0.5.0/Vq-iXfrRf-aHxhJpAh71uoVUlC-rsWvmjzTYOJKhu4M.tar.br",
 }
 
-import pf.Stdout
 import pf.Task
 import pf.Http
-import pf.Utc
 import Html.Html as Html
 import Html.Attr as Attr
 import Request
@@ -67,7 +65,7 @@ routeHx = \ctx, req ->
             Auth.Login.routeHx ctx r
 
         Feed r ->
-            Feed.routeHx r
+            Feed.routeHx ctx r
 
         Index | RobotsTxt ->
             Route.init |> Response.redirect |> Task.ok
@@ -95,22 +93,18 @@ routeReq = \req ->
             |> Response.html
             |> Task.ok
 
-baseCtx = Ctx.init
-
-log : Request.Request -> Task.Task _ []
-log = \req ->
-    date = Utc.now! |> Utc.toIso8601Str
-    Stdout.line! "$(date) $(Inspect.toStr req)"
-
 main : Http.Request -> Task.Task Http.Response []
 main = \httpReq ->
+    ctx = Ctx.init
+
     req = Request.fromHttp httpReq
-    log! req
+    ctx.logger.info! (Inspect.toStr req)
+
     res =
         if
             Hx.isReq httpReq
         then
-            routeHx baseCtx req
+            routeHx ctx req
         else
             routeReq req
     res |> Task.map Response.toHttp
