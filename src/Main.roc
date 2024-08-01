@@ -72,6 +72,8 @@ strToRoute = \str ->
     else
         Login loginRoute
 
+expect strToRoute "/home" == Home
+
 routeHx : Ctx.Ctx, Http.Request -> Task.Task Http.Response []
 routeHx = \ctx, req ->
     when strToRoute req.url is
@@ -116,6 +118,8 @@ routeReq = \req ->
             |> Response.html
             |> Task.ok
 
+baseCtx = Ctx.init
+
 main : Http.Request -> Task.Task Http.Response []
 main = \req ->
 
@@ -123,6 +127,6 @@ main = \req ->
     Stdout.line! "$(date) $(Http.methodToStr req.method) $(req.url)"
 
     if Hx.isReq req then
-        routeHx Ctx.init req
+        routeHx baseCtx req
     else
         routeReq req

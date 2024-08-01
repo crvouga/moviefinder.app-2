@@ -51,8 +51,6 @@ viewSendCode = Html.div
             ],
     ]
 
-
-
 viewVerifyCode : Html.Node
 viewVerifyCode = Html.div
     [
@@ -102,15 +100,14 @@ routeHx = \ctx, req ->
             viewVerifyCode |> Response.html |> Task.ok
 
         ClickedVerifyCode ->
-            responseOk = 
+            responseOk =
                 VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
-            
+
             task =
                 ctx.verifySms.verifyCode! { phone: "123", code: "123" }
                 responseOk
 
             task |> Task.onErr \_ -> responseOk
-            
 
         VerifiedCode ->
             viewVerifiedCode |> Response.html |> Task.ok
