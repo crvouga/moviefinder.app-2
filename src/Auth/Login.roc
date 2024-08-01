@@ -1,7 +1,6 @@
-module [routeHx, strToRoute, Route]
+module [routeHx]
 
 import pf.Task
-import pf.Http
 import Response
 import Html.Html as Html
 import Html.Attr as Attr
@@ -10,29 +9,7 @@ import Ui.TextField as TextField
 import Ui.Button as Button
 import Ui.Typography as Typography
 import Ctx
-# import Auth.VerifySms.VerifySms as VerifySms
-
-Route : [SendCode, ClickedSendCode, VerifyCode, ClickedVerifyCode, VerifiedCode, Unknown]
-
-strToRoute : Str -> Route
-strToRoute = \str ->
-    when str is
-        "/login" -> SendCode
-        "/login/clicked-send-code" -> ClickedSendCode
-        "/login/verify-code" -> VerifyCode
-        "/login/clicked-verify-code" -> ClickedVerifyCode
-        "/login/verified-code" -> VerifiedCode
-        _ -> Unknown
-
-routeToStr : Route -> Str
-routeToStr = \route ->
-    when route is
-        SendCode -> "/login"
-        ClickedSendCode -> "/login/clicked-send-code"
-        VerifyCode -> "/login/verify-code"
-        ClickedVerifyCode -> "/login/clicked-verify-code"
-        VerifiedCode -> "/login/verified-code"
-        Unknown -> "/"
+import Auth.Login.Route
 
 viewSendCode : Html.Node
 viewSendCode = Html.div
@@ -47,7 +24,7 @@ viewSendCode = Html.div
             ]
             [
                 TextField.view { label: "Phone number", inputType: Tel },
-                Button.view { label: "Send code", href: routeToStr ClickedSendCode },
+                Button.view { label: "Send code", href: Auth.Login.Route.encode ClickedSendCode },
             ],
     ]
 
@@ -65,7 +42,7 @@ viewVerifyCode = Html.div
             [
                 Typography.view { text: "Enter the code sent to your phone" },
                 TextField.view { label: "Code", inputType: Tel },
-                Button.view { label: "Verify code", href: routeToStr ClickedVerifyCode },
+                Button.view { label: "Verify code", href: Auth.Login.Route.encode ClickedVerifyCode },
             ],
     ]
 
@@ -86,22 +63,22 @@ viewVerifiedCode = Html.div
             ],
     ]
 
-routeHx : Ctx.Ctx, Http.Request -> Task.Task Http.Response []
-routeHx = \ctx, req ->
-    when strToRoute req.url is
+routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response []
+routeHx = \ctx, route ->
+    when route is
         SendCode ->
             viewSendCode |> Response.html |> Task.ok
 
         ClickedSendCode ->
             ctx.verifySms.sendCode! { phone: "123" }
-            VerifyCode |> routeToStr |> Response.redirect |> Task.ok
+            Login VerifyCode |> Response.redirect |> Task.ok
 
         VerifyCode ->
             viewVerifyCode |> Response.html |> Task.ok
 
         ClickedVerifyCode ->
             responseOk =
-                VerifiedCode |> routeToStr |> Response.redirect |> Task.ok
+                Login VerifiedCode |> Response.redirect |> Task.ok
 
             task =
                 ctx.verifySms.verifyCode! { phone: "123", code: "123" }
@@ -111,6 +88,3 @@ routeHx = \ctx, req ->
 
         VerifiedCode ->
             viewVerifiedCode |> Response.html |> Task.ok
-
-        Unknown ->
-            Unknown |> routeToStr |> Response.redirect |> Task.ok

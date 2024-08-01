@@ -8,16 +8,17 @@ import pf.Http
 import pf.Utc
 import Html.Html as Html
 import Html.Attr as Attr
-import Home
-import Media.Media as Media
+import Request
 import Response
 import Auth.Login
 import Hx
 import Ctx
 import Ui.Spinner as Spinner
+import Route
+import Home
 
-viewDocument : { pageHref : Str } -> Html.Node
-viewDocument = \{ pageHref } ->
+viewDocument : { route : Route.Route } -> Html.Node
+viewDocument = \{ route } ->
     Html.html [Attr.lang "en"] [
         Html.head
             []
@@ -50,7 +51,7 @@ viewDocument = \{ pageHref } ->
                                 Attr.class "flex items-center justify-center w-full h-full",
                                 Hx.swap OuterHtml,
                                 Hx.trigger Load,
-                                Hx.get pageHref,
+                                Hx.get (Route.encode route),
                             ]
                             [
                                 Spinner.view,
@@ -59,74 +60,57 @@ viewDocument = \{ pageHref } ->
             ],
     ]
 
-Route : [Home, Media, Login Auth.Login.Route, Unknown]
-
-strToRoute : Str -> Route
-strToRoute = \str ->
-    loginRoute = Auth.Login.strToRoute str
-    if loginRoute == Unknown then
-        when str is
-            "/home" -> Home
-            "/media" -> Media
-            _ -> Unknown
-    else
-        Login loginRoute
-
-expect strToRoute "/home" == Home
-
-routeHx : Ctx.Ctx, Http.Request -> Task.Task Http.Response []
+routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response []
 routeHx = \ctx, req ->
-    when strToRoute req.url is
-        Login _ ->
-            Auth.Login.routeHx ctx req
+    when req.route is
+        Login route ->
+            Auth.Login.routeHx ctx route
 
         Home ->
-            Home.view |> Response.html |> Task.ok
+            Home.routeHx {}
 
-        Media ->
-            Media.view |> Response.html |> Task.ok
+        _ ->
+            Home |> Response.redirect |> Task.ok
 
-        Unknown ->
-            "/home" |> Response.redirect |> Task.ok
-
-toDefaultRoute : Http.Request -> Str
-toDefaultRoute = \req ->
-    if
-        req.url == "/"
-    then
-        "/home"
-    else
-        req.url
-
-robotsTxt : Str
-robotsTxt =
-    """
-    User-agent: *
-    Allow: /
-    """
-
-routeReq : Http.Request -> Task.Task Http.Response []
+routeReq : Request.Request -> Task.Task Response.Response []
 routeReq = \req ->
-    when req.url is
-        "/robots.txt" ->
+    when req.route is
+        RobotsTxt ->
+            robotsTxt : Str
+            robotsTxt =
+                """
+                User-agent: *
+                Allow: /
+                """
             Response.text robotsTxt |> Task.ok
 
         _ ->
-            req
-            |> toDefaultRoute
-            |> \pageHref -> viewDocument { pageHref }
+            route : Route.Route
+            route =
+                when req.route is
+                    Index -> Home
+                    _ -> req.route
+
+            viewDocument { route }
             |> Response.html
             |> Task.ok
 
 baseCtx = Ctx.init
 
-main : Http.Request -> Task.Task Http.Response []
-main = \req ->
-
+log : Request.Request -> Task.Task _ []
+log = \req ->
     date = Utc.now! |> Utc.toIso8601Str
-    Stdout.line! "$(date) $(Http.methodToStr req.method) $(req.url)"
+    Stdout.line! "$(date) $(Inspect.toStr req)"
 
-    if Hx.isReq req then
-        routeHx baseCtx req
-    else
-        routeReq req
+main : Http.Request -> Task.Task Http.Response []
+main = \httpReq ->
+    req = Request.fromHttp httpReq
+    log! req
+    res =
+        if
+            Hx.isReq httpReq
+        then
+            routeHx baseCtx req
+        else
+            routeReq req
+    res |> Task.map Response.toHttp

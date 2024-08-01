@@ -1,30 +1,25 @@
-module [Query, OrderBy, OrderByDirection, WhereClause, WhereOperation, Value]
+module [Query, OrderBy, OrderByDirection, Where, todoQuery, mediaQuery]
 
 OrderByDirection : [Asc, Desc]
 
 Query field : {
-    limit : Int,
-    offset : Int,
+    limit : I32,
+    offset : I32,
     orderBy : OrderBy field,
     where : Where field,
 }
 
-OrderBy field : {
-    field : field,
-    direction : OrderByDirection,
-}
+OrderBy a : [Asc a, Desc a]
 
-Value : [Str, Int, Bool]
-
-Where field : List (WhereClause field)
-
-WhereOperation : [Eq, Neq, Gt, Gte, Lt, Lte, In, Like, And, Or]
-
-WhereClause field : {
-    operation : WhereOperation,
-    field : field,
-    value : Value,
-}
+Where a : [
+    And (List (Where a)),
+    Or (List (Where a)),
+    EqNum a F64,
+    NeqNum a F64,
+    EqStr a Str,
+    Like a Str,
+    Gte a F64,
+]
 
 #
 #
@@ -38,20 +33,10 @@ todoQuery : Query TodoField
 todoQuery = {
     limit: 10,
     offset: 0,
-    orderBy: {
-        field: Id,
-        direction: Asc,
-    },
-    where: {
-        combine: And,
-        clauses: [
-            {
-                operation: Eq,
-                field: Completed,
-                value: Bool False,
-            },
-        ],
-    },
+    orderBy: Asc Id,
+    where: And [
+        Like Title "%My Todo%",
+    ],
 }
 
 #
@@ -65,24 +50,8 @@ mediaQuery : Query MediaField
 mediaQuery = {
     limit: 10,
     offset: 0,
-    orderBy: {
-        field: Rating,
-        direction: Desc,
-    },
-    where: {
-        combine: And,
-        clauses: [
-            {
-                operation: Gt,
-                field: Rating,
-                value: Int 5,
-            },
-            {
-                operation: In,
-                field: Genre,
-                value: Str "Action",
-            },
-        ],
-    },
+    orderBy: Desc Rating,
+    where: And [
+        Gte Rating 10,
+    ],
 }
-
