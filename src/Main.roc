@@ -15,7 +15,7 @@ import Hx
 import Ctx
 import Ui.Spinner as Spinner
 import Route
-import Home
+import Feed
 
 viewDocument : { route : Route.Route } -> Html.Node
 viewDocument = \{ route } ->
@@ -63,14 +63,14 @@ viewDocument = \{ route } ->
 routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response []
 routeHx = \ctx, req ->
     when req.route is
-        Login route ->
-            Auth.Login.routeHx ctx route
+        Login r ->
+            Auth.Login.routeHx ctx r
 
-        Home ->
-            Home.routeHx {}
+        Feed r ->
+            Feed.routeHx r
 
-        _ ->
-            Home |> Response.redirect |> Task.ok
+        Index | RobotsTxt ->
+            Route.init |> Response.redirect |> Task.ok
 
 routeReq : Request.Request -> Task.Task Response.Response []
 routeReq = \req ->
@@ -88,7 +88,7 @@ routeReq = \req ->
             route : Route.Route
             route =
                 when req.route is
-                    Index -> Home
+                    Index -> Route.init
                     _ -> req.route
 
             viewDocument { route }

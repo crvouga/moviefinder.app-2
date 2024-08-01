@@ -1,22 +1,16 @@
-module [Route, encode, decode]
+module [Route, encode, decode, init]
 import Auth.Login.Route
+import Feed.Route
 
 Route : [
     Login Auth.Login.Route.Route,
-    Home,
+    Feed Feed.Route.Route,
     RobotsTxt,
     Index,
-    Unknown,
 ]
 
-toPaths : Str -> List Str
-toPaths = \url ->
-    (Str.split url "/")
-    |> \strs -> List.keepIf strs (\str -> str |> Str.isEmpty |> Bool.not)
-    |> \strs -> List.map strs (\str -> Str.withPrefix str "/")
-
-expect toPaths "/auth" == ["/auth"]
-expect (toPaths "/auth/login/verify") == ["/auth", "/login", "/verify"]
+init : Route
+init = Feed Feed
 
 decode : Str -> Route
 decode = \url ->
@@ -30,8 +24,8 @@ decode = \url ->
         "/login" ->
             Login (Auth.Login.Route.decode url)
 
-        "/home" ->
-            Home
+        "/feed" ->
+            Feed (Feed.Route.decode url)
 
         "/robots.txt" ->
             RobotsTxt
@@ -40,10 +34,9 @@ decode = \url ->
             Index
 
         _ ->
-            Unknown
+            Index
 
-expect decode "/home" == Home
-expect decode "/foo" == Unknown
+expect decode "/feed" == Feed Feed
 expect decode "/login/verify-code" == Login VerifyCode
 
 encode : Route -> Str
@@ -52,8 +45,8 @@ encode = \route ->
         Login r ->
             Auth.Login.Route.encode r
 
-        Home ->
-            "/home"
+        Feed r ->
+            Feed.Route.encode r
 
         RobotsTxt ->
             "/robots"
@@ -61,5 +54,11 @@ encode = \route ->
         Index ->
             "/"
 
-        Unknown ->
-            "/home"
+toPaths : Str -> List Str
+toPaths = \url ->
+    (Str.split url "/")
+    |> \strs -> List.keepIf strs (\str -> str |> Str.isEmpty |> Bool.not)
+    |> \strs -> List.map strs (\str -> Str.withPrefix str "/")
+
+expect toPaths "/auth" == ["/auth"]
+expect (toPaths "/auth/login/verify") == ["/auth", "/login", "/verify"]
