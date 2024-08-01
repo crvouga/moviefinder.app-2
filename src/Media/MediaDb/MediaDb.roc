@@ -8,5 +8,5 @@ import Media.Media exposing [Media]
 MediaField : [MediaId]
 
 MediaDb : {
-    find : Query MediaField -> Task (Paginated Media) [],
+    query : Query MediaField -> Task (Paginated Media) [],
 }

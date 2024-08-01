@@ -12,9 +12,16 @@ import Ctx
 import Feed.Route
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response []
-routeHx = \_ctx, route ->
+routeHx = \ctx, route ->
     when route is
         Feed ->
+            queried = ctx.mediaDb.query! {
+                limit: 0,
+                offset: 10,
+                orderBy: Asc MediaId,
+                where: And [],
+            }
+            ctx.logger.info! (Inspect.toStr queried)
             viewFeed |> Response.html |> Task.ok
 
 viewFeed : Html.Node

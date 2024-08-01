@@ -15,6 +15,57 @@ import Ui.Spinner as Spinner
 import Route
 import Feed
 
+main : Http.Request -> Task.Task Http.Response []
+main = \httpReq ->
+    ctx = Ctx.init
+
+    req = Request.fromHttp httpReq
+    ctx.logger.info! (Inspect.toStr req)
+
+    res =
+        if
+            Hx.isReq httpReq
+        then
+            routeHx ctx req
+        else
+            routeReq req
+    res |> Task.map Response.toHttp
+
+routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response []
+routeHx = \ctx, req ->
+    when req.route is
+        Login r ->
+            Auth.Login.routeHx ctx r
+
+        Feed r ->
+            Feed.routeHx ctx r
+
+        Index | RobotsTxt ->
+            Route.init |> Response.redirect |> Task.ok
+
+routeReq : Request.Request -> Task.Task Response.Response []
+routeReq = \req ->
+    when req.route is
+        RobotsTxt ->
+            robotsTxt : Str
+            robotsTxt =
+                """
+                User-agent: *
+                Allow: /
+                """
+            Response.text robotsTxt |> Task.ok
+
+        _ ->
+            route : Route.Route
+            route =
+                when req.route is
+                    Index -> Route.init
+                    _ -> req.route
+
+            viewDocument { route }
+            |> Response.html
+            |> Task.ok
+
 viewDocument : { route : Route.Route } -> Html.Node
 viewDocument = \{ route } ->
     Html.html [Attr.lang "en"] [
@@ -57,54 +108,3 @@ viewDocument = \{ route } ->
                     ],
             ],
     ]
-
-routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response []
-routeHx = \ctx, req ->
-    when req.route is
-        Login r ->
-            Auth.Login.routeHx ctx r
-
-        Feed r ->
-            Feed.routeHx ctx r
-
-        Index | RobotsTxt ->
-            Route.init |> Response.redirect |> Task.ok
-
-routeReq : Request.Request -> Task.Task Response.Response []
-routeReq = \req ->
-    when req.route is
-        RobotsTxt ->
-            robotsTxt : Str
-            robotsTxt =
-                """
-                User-agent: *
-                Allow: /
-                """
-            Response.text robotsTxt |> Task.ok
-
-        _ ->
-            route : Route.Route
-            route =
-                when req.route is
-                    Index -> Route.init
-                    _ -> req.route
-
-            viewDocument { route }
-            |> Response.html
-            |> Task.ok
-
-main : Http.Request -> Task.Task Http.Response []
-main = \httpReq ->
-    ctx = Ctx.init
-
-    req = Request.fromHttp httpReq
-    ctx.logger.info! (Inspect.toStr req)
-
-    res =
-        if
-            Hx.isReq httpReq
-        then
-            routeHx ctx req
-        else
-            routeReq req
-    res |> Task.map Response.toHttp
