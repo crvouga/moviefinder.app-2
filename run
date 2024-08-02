@@ -1,0 +1,3 @@
+#!/bin/bash
+clear
+roc check ./src/Main.roc && roc format && roc run ./src/Main.roc

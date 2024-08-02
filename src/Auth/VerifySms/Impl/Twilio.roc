@@ -1,6 +1,6 @@
 module [init, Config]
 
-import Auth.VerifySms.VerifySms as VerifySms
+import Auth.VerifySms as VerifySms
 import pf.Task
 import pf.Sleep
 import Logger

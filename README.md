@@ -3,7 +3,8 @@
 ## Run
 
 ```sh
-roc run ./src/Main.roc
+chmod +x ./run
+./run
 ```
 
 ## Build Docker

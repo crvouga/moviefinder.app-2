@@ -1,7 +1,7 @@
 module [init, Impl]
 
-import Media.MediaDb.MediaDb as MediaDb
-import Media.MediaDb.MediaDbImpl.TmdbMovie as TmdbMovie
+import Media.MediaDb as MediaDb
+import Media.MediaDb.Impl.TmdbMovie as TmdbMovie
 
 Impl : [TmdbMovie TmdbMovie.Config]
 

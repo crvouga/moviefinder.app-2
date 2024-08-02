@@ -1,7 +1,7 @@
 module [init, Config]
 
 import pf.Task exposing [Task]
-import Media.MediaDb.MediaDb exposing [MediaDb]
+import Media.MediaDb exposing [MediaDb]
 import Media.Media exposing [testData]
 
 Config : { tmdbApiReadAccessToken : Str }
