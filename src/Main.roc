@@ -4,7 +4,7 @@ app [main] {
 
 import pf.Task
 import pf.Http
-import Html.Html as Html
+import Html
 import Html.Attr as Attr
 import Request
 import Response

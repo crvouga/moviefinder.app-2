@@ -1,6 +1,6 @@
 module [Media, view, testData]
 
-import Html.Html as Html
+import Html
 import Html.Attr as Attr
 import Ui.Button as Button
 
@@ -18,14 +18,14 @@ testData : List Media
 testData = [
     {
         mediaId: "1",
-        mediaTitle: "Movie",
+        mediaTitle: "Some Movie",
         mediaDescription: "My movie",
         mediaType: Movie,
         mediaPosterUrl: "",
     },
     {
         mediaId: "2",
-        mediaTitle: "Tv Show",
+        mediaTitle: "Some Tv Show",
         mediaDescription: "My tv",
         mediaType: Tv,
         mediaPosterUrl: "",

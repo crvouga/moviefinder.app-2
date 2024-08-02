@@ -7,7 +7,7 @@ module [
 ]
 
 import pf.Http
-import Html.Html as Html
+import Html
 import Route
 
 Response : [

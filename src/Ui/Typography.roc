@@ -1,6 +1,6 @@
 module [view]
 
-import Html.Html as Html
+import Html
 import Html.Attr as Attr
 
 Variant : [H1, H2, H3, H4, H5, H6, Body, Caption, Overline, Subtitle]

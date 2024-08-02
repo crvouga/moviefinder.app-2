@@ -1,6 +1,6 @@
 module [view]
 
-import Html.Html as Html
+import Html
 import Html.Attr as Attr
 import Hx
 
