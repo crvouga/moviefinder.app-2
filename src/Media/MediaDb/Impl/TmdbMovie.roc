@@ -4,25 +4,9 @@ import pf.Task exposing [Task]
 import pf.Http
 import Media.MediaDb exposing [MediaDb, MediaDbQuery]
 import Media exposing [Media]
-import json.Json
 import Logger
 import Media.MediaDb.Impl.Tmdb as Tmdb
-
-decodeJsonWithFallback : List U8, val -> Task.Task val [] where val implements Decoding
-decodeJsonWithFallback = \json, fallback ->
-
-    decoder = Json.utf8With { fieldNameMapping: SnakeCase }
-
-    decoded = Decode.fromBytesPartial json decoder
-
-    when decoded.result is
-        Ok record ->
-            Task.ok record
-
-        Err err ->
-            when err is
-                TooShort ->
-                    Task.ok fallback
+import Json exposing [decodeJsonWithFallback]
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -66,13 +50,13 @@ getDiscoverMovie = \config ->
     task =
         response = Http.send! (Tmdb.toRequest config "/discover/movie")
         discoverMovieResult = decodeJsonWithFallback! (Str.toUtf8 response) emptyResult
-        mediaList = List.map discoverMovieResult.results tmdbDiscoverMovieResultToMedia
+        mediaList = List.map discoverMovieResult.results tmdbMovieToMedia
         Task.ok mediaList
 
     task |> Task.onErr (\_ -> Task.ok [])
 
-tmdbDiscoverMovieResultToMedia : TmdbDiscoverMovieResult -> Media
-tmdbDiscoverMovieResultToMedia = \tmdbMovie -> {
+tmdbMovieToMedia : TmdbDiscoverMovieResult -> Media
+tmdbMovieToMedia = \tmdbMovie -> {
     mediaId: Num.toStr tmdbMovie.id,
     mediaTitle: tmdbMovie.title,
     mediaDescription: "Str",

@@ -1,4 +1,4 @@
-module [baseUrl, Config, toBaseHeaders, toRequest, toBaseHeaders]
+module [baseUrl, Config, toBaseHeaders, toRequest, toBaseHeaders, TmdbConfig]
 
 import pf.Http
 
@@ -31,3 +31,17 @@ toRequest = \config, path -> { Http.defaultRequest &
         headers: toBaseHeaders config,
         url: "$(baseUrl)$(path)",
     }
+
+# https://developer.themoviedb.org/reference/configuration-details
+TmdbConfig : {
+    images : {
+        baseUrl : Str,
+        secureBaseUrl : Str,
+        backdropSizes : List Str,
+        logoSizes : List Str,
+        posterSizes : List Str,
+        profileSizes : List Str,
+        stillSizes : List Str,
+    },
+    changeKeys : List Str,
+}
