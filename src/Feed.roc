@@ -13,6 +13,7 @@ import Hx
 import Ui.Spinner
 import App.BottomNavigation
 import ImageSet
+import Ui.Swiper
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -33,17 +34,19 @@ routeHx = \ctx, route ->
 viewFeed : Html.Node
 viewFeed =
     Html.div [Attr.class "w-full h-full flex flex-col"] [
-        Html.div [Attr.class "w-full flex-1 overflow-y-scroll"] [
-            Html.div
-                [
-                    Attr.class "flex items-center justify-center w-full h-full",
-                    Hx.swap OuterHtml,
-                    Hx.trigger Load,
-                    Hx.get (Feed.Route.encode FeedItems),
-                ]
-                [
-                    Ui.Spinner.view,
-                ],
+        Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
+            Ui.Swiper.container { classList: ["h-full"] } [
+                Html.div
+                    [
+                        Attr.class "flex items-center justify-center w-full h-full",
+                        Hx.swap OuterHtml,
+                        Hx.trigger Load,
+                        Hx.get (Feed.Route.encode FeedItems),
+                    ]
+                    [
+                        Ui.Spinner.view,
+                    ],
+            ],
         ],
         App.BottomNavigation.view Home,
     ]
@@ -55,14 +58,16 @@ viewFeedItems = \mediaList ->
 
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
-    Html.div
-        [
-            Attr.class "w-full p-4",
-        ]
-        [
-            Html.img [
-                Attr.class "w-full",
-                Attr.src (ImageSet.highestRes media.mediaPoster),
+    Ui.Swiper.slide [
+        Html.div
+            [
+                Attr.class "w-full h-full",
+            ]
+            [
+                Html.img [
+                    Attr.class "w-full h-full object-cover",
+                    Attr.src (ImageSet.highestRes media.mediaPoster),
+                ],
+                # Html.text media.mediaTitle,
             ],
-            Html.text media.mediaTitle,
-        ]
+    ]
