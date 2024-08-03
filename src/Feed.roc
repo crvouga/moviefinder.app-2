@@ -51,6 +51,19 @@ viewFeed =
         App.BottomNavigation.view Home,
     ]
 
+viewFeedItemLoadMore : Html.Node
+viewFeedItemLoadMore =
+    Html.div
+        [
+            Attr.class "w-full h-full flex items-center justify-center",
+            Hx.swap OuterHtml,
+            Hx.trigger Load,
+            Hx.get (Feed.Route.encode FeedItems),
+        ]
+        [
+            Ui.Spinner.view,
+        ]
+
 viewFeedItems : List Media.Media -> Html.Node
 viewFeedItems = \mediaList ->
     Html.fragment
@@ -68,6 +81,5 @@ viewFeedItem = \media ->
                     Attr.class "w-full h-full object-cover",
                     Attr.src (ImageSet.highestRes media.mediaPoster),
                 ],
-                # Html.text media.mediaTitle,
             ],
     ]
