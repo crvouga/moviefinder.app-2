@@ -1,4 +1,4 @@
-module [MediaDb]
+module [MediaDb, MediaDbQuery, MediaField]
 
 import pf.Task exposing [Task]
 import Query exposing [Query]
@@ -7,6 +7,8 @@ import Media exposing [Media]
 
 MediaField : [MediaId]
 
+MediaDbQuery : Query MediaField -> Task (Paginated Media) []
+
 MediaDb : {
-    query : Query MediaField -> Task (Paginated Media) [],
+    query : MediaDbQuery,
 }

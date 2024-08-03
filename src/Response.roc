@@ -25,6 +25,13 @@ text = Text
 redirect : Route.Route -> Response
 redirect = \route -> Redirect route
 
+httpHeader : Str, Str -> Http.Header
+httpHeader = \name, value -> {
+    name,
+    value: Str.toUtf8 value,
+    # value,
+}
+
 toHttp : Response -> Http.Response
 toHttp = \res ->
     when res is
@@ -32,7 +39,7 @@ toHttp = \res ->
             {
                 status: 200,
                 headers: [
-                    { name: "Content-Type", value: Str.toUtf8 "text/html; charset=utf-8" },
+                    httpHeader "Content-Type" "text/html; charset=utf-8",
                 ],
                 body: node |> Html.render |> Str.toUtf8,
             }
@@ -41,7 +48,7 @@ toHttp = \res ->
             {
                 status: 200,
                 headers: [
-                    { name: "Content-Type", value: Str.toUtf8 "text/plain; charset=utf-8" },
+                    httpHeader "Content-Type" "text/plain; charset=utf-8",
                 ],
                 body: Str.toUtf8 body,
             }
@@ -51,8 +58,8 @@ toHttp = \res ->
             {
                 status: 302,
                 headers: [
-                    { name: "Location", value: Str.toUtf8 url },
-                    { name: "Hx-Push-Url", value: Str.toUtf8 url },
+                    httpHeader "Location" url,
+                    httpHeader "Hx-Push-Url" url,
                 ],
                 body: Str.toUtf8 "",
             }

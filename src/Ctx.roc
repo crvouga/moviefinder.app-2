@@ -17,6 +17,6 @@ logger = Logger.init ["app"]
 init : Ctx
 init = {
     verifySms: Auth.VerifySms.Impl.init (Fake { code: "123", logger: Logger.init ["verify-sms-fake"] }),
-    mediaDb: Media.MediaDb.Impl.init (TmdbMovie { tmdbApiReadAccessToken: "123" }),
+    mediaDb: Media.MediaDb.Impl.init (TmdbMovie { tmdbApiReadAccessToken: "123", logger: Logger.init ["media-db"] }),
     logger,
 }
