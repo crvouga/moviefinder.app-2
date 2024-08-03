@@ -1,5 +1,6 @@
 module [
     get,
+    HttpClient,
 ]
 import pf.Task exposing [Task]
 import pf.Http exposing [send, defaultRequest]
@@ -31,7 +32,3 @@ get = \url, fmt ->
                         _ -> HttpErr Timeout
                 )
         )
-
-HttpClient : {
-
-}
