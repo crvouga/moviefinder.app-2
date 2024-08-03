@@ -1,10 +1,12 @@
 module [Route, encode, decode, init]
 import Auth.Login.Route
 import Feed.Route
+import Account.Route
 
 Route : [
     Index,
     RobotsTxt,
+    Account Account.Route.Route,
     Login Auth.Login.Route.Route,
     Feed Feed.Route.Route,
 ]
@@ -27,6 +29,9 @@ decode = \url ->
         "/feed" ->
             Feed (Feed.Route.decode url)
 
+        "/account" ->
+            Account (Account.Route.decode url)
+
         "/robots.txt" ->
             RobotsTxt
 
@@ -47,6 +52,9 @@ encode = \route ->
 
         Feed r ->
             Feed.Route.encode r
+
+        Account r ->
+            Account.Route.encode r
 
         RobotsTxt ->
             "/robots"

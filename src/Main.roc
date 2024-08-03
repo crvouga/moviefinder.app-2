@@ -15,6 +15,7 @@ import Hx
 import Ctx
 import Ui.Spinner as Spinner
 import Route
+import Account
 import Feed
 
 main : Http.Request -> Task.Task Http.Response []
@@ -43,6 +44,9 @@ routeHx = \ctx, req ->
 
         Feed r ->
             Feed.routeHx ctx r
+
+        Account r ->
+            Account.routeHx ctx r
 
         Index | RobotsTxt ->
             Route.init |> Response.redirect |> Task.ok

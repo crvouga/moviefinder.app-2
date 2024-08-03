@@ -23,6 +23,7 @@ module [
     checked,
     cite,
     class,
+    classList,
     code,
     codebase,
     color,
@@ -229,6 +230,10 @@ cite = attribute "cite"
 ## Construct a `class` attribute.
 class : Str -> Attribute
 class = attribute "class"
+
+## Construct a `class` attribute from list
+classList : List Str -> Attribute
+classList = \strList -> (attribute "class") (Str.joinWith strList " ")
 
 ## Construct a `code` attribute.
 code : Str -> Attribute
