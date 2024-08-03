@@ -49,8 +49,7 @@ viewFeed =
 
 viewFeedItems : List Media.Media -> Html.Node
 viewFeedItems = \mediaList ->
-    Html.div
-        [Attr.class "flex flex-col w-full flex-1"]
+    Html.fragment
         (List.map mediaList viewFeedItem)
 
 viewFeedItem : Media.Media -> Html.Node

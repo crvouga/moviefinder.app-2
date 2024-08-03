@@ -1,5 +1,6 @@
 module [
     Node,
+    fragment,
     text,
     element,
     voidElement,
@@ -141,7 +142,7 @@ import Html.Attr exposing [Attribute, attribute]
 import Html.SafeStr as SafeStr exposing [SafeStr, escape, dangerouslyMarkSafe]
 
 ## An HTML node, either an HTML element or some text inside an HTML element.
-Node : [Element Str U64 (List Attribute) (List Node), Text Str, UnescapedHtml Str]
+Node : [Element Str U64 (List Attribute) (List Node), Text Str, UnescapedHtml Str, Fragment (List Node)]
 
 ## Create a `Text` node containing a string.
 ##
@@ -216,6 +217,9 @@ voidElement = \tagName ->
 nodeSize : Node -> U64
 nodeSize = \node ->
     when node is
+        Fragment children ->
+            children |> List.map nodeSize |> List.sum
+
         Text content ->
             # We allocate more bytes than the original string had because we'll need extra bytes
             # if there are any characters we need to escape. My choice of the proportion 3/2
@@ -272,6 +276,9 @@ renderWithoutDocType = \node ->
 renderHelp : SafeStr, Node -> SafeStr
 renderHelp = \buffer, node ->
     when node is
+        Fragment children ->
+            List.walk children buffer (\acc, child -> renderHelp acc child)
+
         Text content ->
             SafeStr.concat buffer (escape content)
 
@@ -798,3 +805,7 @@ slot = element "slot"
 ## Construct a `template` element.
 template : List Attribute, List Node -> Node
 template = element "template"
+
+fragment : List Node -> Node
+fragment = \children ->
+    Fragment children

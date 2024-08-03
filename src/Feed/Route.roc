@@ -6,11 +6,11 @@ encode : Route -> Str
 encode = \route ->
     when route is
         Feed -> "/feed"
-        FeedItems -> "/feed/items"
+        FeedItems -> "/feed/feed-items"
 
 decode : Str -> Route
 decode = \str ->
     when str is
         "/feed" -> Feed
-        "/feed/items" -> FeedItems
+        "/feed/feed-items" -> FeedItems
         _ -> Feed
