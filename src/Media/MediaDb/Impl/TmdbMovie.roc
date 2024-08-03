@@ -13,18 +13,20 @@ import pf.Stdout
 decodeJsonWithFallback : List U8, val -> Task.Task val [] where val implements Decoding
 decodeJsonWithFallback = \json, fallback ->
 
-    Stdout.line! "json->$(Result.withDefault (Str.fromUtf8 json) "Failed to decode json from utf8")"
+    Stdout.line! "json=$(Result.withDefault (Str.fromUtf8 json) "Failed to decode json from utf8")"
 
-    decoder = Json.utf8With { fieldNameMapping: PascalCase }
+    decoder = Json.utf8With { fieldNameMapping: SnakeCase }
 
     decoded = Decode.fromBytesPartial json decoder
 
-    output =
-        when decoded.result is
-            Ok record -> record
-            Err _ -> fallback
+    when decoded.result is
+        Ok record ->
+            Task.ok record
 
-    Task.ok output
+        Err err ->
+            when err is
+                TooShort ->
+                    Task.ok fallback
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -39,7 +41,7 @@ TmdbDiscoverMovieResult : {
     originalLanguage : Str,
     originalTitle : Str,
     overview : Str,
-    populatiry : F32,
+    popularity : F32,
     posterPath : Str,
     releaseDate : Str,
     title : Str,
