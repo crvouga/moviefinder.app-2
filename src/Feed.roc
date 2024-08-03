@@ -22,7 +22,6 @@ routeHx = \ctx, route ->
                     orderBy: Asc MediaId,
                     where: And [],
                 }
-            ctx.logger.info! (Inspect.toStr queried)
             queried.rows |> viewFeed |> Response.html |> Task.ok
 
 viewFeed : List Media.Media -> Html.Node

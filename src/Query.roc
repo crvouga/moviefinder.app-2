@@ -3,8 +3,8 @@ module [Query, OrderBy, OrderByDirection, Where, todoQuery, mediaQuery]
 OrderByDirection : [Asc, Desc]
 
 Query field : {
-    limit : I32,
-    offset : I32,
+    limit : U64,
+    offset : U64,
     orderBy : OrderBy field,
     where : Where field,
 }

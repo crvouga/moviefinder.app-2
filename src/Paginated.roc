@@ -2,7 +2,7 @@ module [Paginated]
 
 Paginated a : {
     rows : List a,
-    total : I32,
-    offset : I32,
-    limit : I32,
+    total : U64,
+    offset : U64,
+    limit : U64,
 }

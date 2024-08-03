@@ -15,17 +15,9 @@ import Route
 import App.BottomNavigation as BottomNavigation
 
 routeHx : Ctx.Ctx, Account.Route.Route -> Task.Task Response.Response _
-routeHx = \ctx, route ->
+routeHx = \_ctx, route ->
     when route is
         Account ->
-            queried =
-                ctx.mediaDb.query! {
-                    limit: 0,
-                    offset: 10,
-                    orderBy: Asc MediaId,
-                    where: And [],
-                }
-            ctx.logger.info! (Inspect.toStr queried)
             view |> Response.html |> Task.ok
 
 view : Html.Node
