@@ -24,6 +24,9 @@ view = Html.div [Attr.class "w-full h-full flex flex-col"] [
             Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
         ]
         [
-            Button.view { label: "Login", href: "/login" },
+            Button.view {
+                label: "Login",
+                href: "/login",
+            },
         ],
 ]

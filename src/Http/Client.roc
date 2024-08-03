@@ -31,3 +31,7 @@ get = \url, fmt ->
                         _ -> HttpErr Timeout
                 )
         )
+
+HttpClient : {
+
+}
