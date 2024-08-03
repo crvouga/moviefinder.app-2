@@ -5,6 +5,7 @@ app [main] {
 
 import pf.Task
 import pf.Http
+import pf.Env
 import Html
 import Html.Attr as Attr
 import Request
@@ -18,7 +19,9 @@ import Feed
 
 main : Http.Request -> Task.Task Http.Response []
 main = \httpReq ->
-    ctx = Ctx.init
+    tmdbApiReadAccessToken <- Env.var "TMDB_API_READ_ACCESS_TOKEN" |> Task.onErr (\_ -> crash "Missing env var") |> Task.await
+
+    ctx = Ctx.init { tmdbApiReadAccessToken }
 
     req = Request.fromHttp httpReq
     ctx.logger.info! (Inspect.toStr req)
@@ -32,7 +35,7 @@ main = \httpReq ->
             routeReq req
     res |> Task.map Response.toHttp
 
-routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response []
+routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response _
 routeHx = \ctx, req ->
     when req.route is
         Login r ->
@@ -44,7 +47,7 @@ routeHx = \ctx, req ->
         Index | RobotsTxt ->
             Route.init |> Response.redirect |> Task.ok
 
-routeReq : Request.Request -> Task.Task Response.Response []
+routeReq : Request.Request -> Task.Task Response.Response _
 routeReq = \req ->
     when req.route is
         RobotsTxt ->

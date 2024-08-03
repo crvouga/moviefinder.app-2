@@ -11,7 +11,7 @@ import Ui.Typography as Typography
 import Ctx
 import Auth.Login.Route
 
-routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response []
+routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
         SendCode ->

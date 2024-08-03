@@ -12,7 +12,7 @@ import Ctx
 import Feed.Route
 import Media
 
-routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response []
+routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
         Feed ->
@@ -30,12 +30,14 @@ viewFeed : List Media.Media -> Html.Node
 viewFeed = \mediaList ->
     Html.div [Attr.class "w-full h-full flex flex-col"] [
         TopBar.view { title: "Feed" },
-        Html.div
-            [Attr.class "flex flex-col w-full p-4 gap-8"]
-            [Button.view { label: "Account", href: "/login" }],
-        Html.div
-            [Attr.class "flex flex-col w-full flex-1"]
-            (List.map mediaList viewFeedItem),
+        Html.div [Attr.class "w-full flex-1 overflow-y-scroll"] [
+            Html.div
+                [Attr.class "flex flex-col w-full p-4 gap-8"]
+                [Button.view { label: "Account", href: "/login" }],
+            Html.div
+                [Attr.class "flex flex-col w-full flex-1"]
+                (List.map mediaList viewFeedItem),
+        ],
     ]
 
 viewFeedItem : Media.Media -> Html.Node

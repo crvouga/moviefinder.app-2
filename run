@@ -1,3 +1,8 @@
 #!/bin/bash
 clear
-roc check ./src/Main.roc && roc format && roc run ./src/Main.roc
+
+# Load environment variables from .env file
+export $(grep -v '^#' .env | xargs)
+
+# Run the roc commands with the environment variable
+roc check ./src/Main.roc && roc format && TMDB_API_READ_ACCESS_TOKEN="$TMDB_API_READ_ACCESS_TOKEN" roc run ./src/Main.roc

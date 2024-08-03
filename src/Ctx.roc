@@ -14,9 +14,9 @@ Ctx : {
 
 logger = Logger.init ["app"]
 
-init : Ctx
-init = {
+init : { tmdbApiReadAccessToken : Str }* -> Ctx
+init = \config -> {
     verifySms: Auth.VerifySms.Impl.init (Fake { code: "123", logger: Logger.init ["verify-sms-fake"] }),
-    mediaDb: Media.MediaDb.Impl.init (TmdbMovie { tmdbApiReadAccessToken: "123", logger: Logger.init ["media-db"] }),
+    mediaDb: Media.MediaDb.Impl.init (TmdbMovie { tmdbApiReadAccessToken: config.tmdbApiReadAccessToken, logger: Logger.init ["media-db"] }),
     logger,
 }
