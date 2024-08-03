@@ -3,6 +3,7 @@ module [Media, view, testData]
 import Html
 import Html.Attr as Attr
 import Ui.Button as Button
+import ImageSet
 
 MediaType : [Movie, Tv]
 
@@ -11,7 +12,7 @@ Media : {
     mediaTitle : Str,
     mediaDescription : Str,
     mediaType : MediaType,
-    mediaPosterUrl : Str,
+    mediaPoster : ImageSet.ImageSet,
 }
 
 testData : List Media
@@ -21,14 +22,14 @@ testData = [
         mediaTitle: "Some Movie",
         mediaDescription: "My movie",
         mediaType: Movie,
-        mediaPosterUrl: "",
+        mediaPoster: ImageSet.empty,
     },
     {
         mediaId: "2",
         mediaTitle: "Some Tv Show",
         mediaDescription: "My tv",
         mediaType: Tv,
-        mediaPosterUrl: "",
+        mediaPoster: ImageSet.empty,
     },
 ]
 

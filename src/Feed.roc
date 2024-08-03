@@ -12,6 +12,7 @@ import Media
 import Hx
 import Ui.Spinner
 import App.BottomNavigation
+import ImageSet
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -59,5 +60,9 @@ viewFeedItem = \media ->
             Attr.class "w-full p-4",
         ]
         [
+            Html.img [
+                Attr.class "w-full",
+                Attr.src (ImageSet.highestRes media.mediaPoster),
+            ],
             Html.text media.mediaTitle,
         ]

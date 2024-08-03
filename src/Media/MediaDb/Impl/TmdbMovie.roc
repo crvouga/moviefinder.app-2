@@ -7,7 +7,8 @@ import Media exposing [Media]
 import Logger
 import Media.MediaDb.Impl.Tmdb as Tmdb
 import Json exposing [decodeJsonWithFallback]
-# import pf.Stdout
+import ImageSet
+import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -49,25 +50,32 @@ emptyResult = {
 getDiscoverMovie : Config -> Task (List Media) []
 getDiscoverMovie = \config ->
     task =
+        tmdbConfig = Tmdb.getTmdbConfig! config
+        Stdout.line! (Inspect.toStr tmdbConfig)
         response = Http.send! (Tmdb.toRequest config "/discover/movie")
         discoverMovieResult = decodeJsonWithFallback! (Str.toUtf8 response) emptyResult
-        mediaList = List.map discoverMovieResult.results tmdbMovieToMedia
+        mediaList = List.map discoverMovieResult.results \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
         Task.ok mediaList
 
     task |> Task.onErr (\_ -> Task.ok [])
 
-tmdbMovieToMedia : TmdbDiscoverMovieResult -> Media
-tmdbMovieToMedia = \tmdbMovie -> {
+toPosterImageSet : Tmdb.TmdbConfig, Str -> ImageSet.ImageSet
+toPosterImageSet = \tmdbConfig, posterPath ->
+    tmdbConfig.images.posterSizes
+    |> List.map \size -> [tmdbConfig.images.baseUrl, size, posterPath] |> Str.joinWith ""
+    |> \lowestResFirst -> ImageSet.init { lowestResFirst }
+
+tmdbMovieToMedia : Tmdb.TmdbConfig, TmdbDiscoverMovieResult -> Media
+tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
     mediaId: Num.toStr tmdbMovie.id,
     mediaTitle: tmdbMovie.title,
-    mediaDescription: "Str",
+    mediaDescription: tmdbMovie.overview,
     mediaType: Movie,
-    mediaPosterUrl: "Str",
+    mediaPoster: toPosterImageSet tmdbConfig tmdbMovie.posterPath,
 }
 
 query : Config -> MediaDbQuery
 query = \config -> \queryInput ->
-
         mediaList = getDiscoverMovie! config
 
         sliced =
