@@ -36,7 +36,11 @@ view : Html.Node
 view = Html.div [] [
     Html.h1 [] [Html.text "Hello, World! Media.roc"],
     Html.p [] [Html.text "This is a simple Roc web app."],
-    Button.view { label: "Go home", href: "/home" },
+    Button.view {
+        label: "Go home",
+        href: "/home",
+        target: "#app",
+    },
     Html.p [] [
         Html.text "You should really check out ",
         Html.a [Attr.href "https://roc-lang.org/"] [Html.text "Roc"],

@@ -33,11 +33,11 @@ variantToClass = \variant ->
         Overline -> "text-xs"
         Subtitle -> "text-lg"
 
-view : { text : Str, variant ? Variant } -> Html.Node
-view = \{ text, variant ? Body } ->
+view : { text : Str, variant ? Variant, class ? Str } -> Html.Node
+view = \{ text, variant ? Body, class ? "" } ->
     (Html.element (variantToHtmlTag variant))
         [
-            Attr.class (variantToClass variant),
+            Attr.classList [variantToClass variant, class],
         ]
         [
             Html.text text,

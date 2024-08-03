@@ -49,8 +49,15 @@ viewSendCode = Html.div
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
             ]
             [
-                TextField.view { label: "Phone number", inputType: Tel },
-                Button.view { label: "Send code", href: Auth.Login.Route.encode ClickedSendCode },
+                TextField.view {
+                    label: "Phone number",
+                    inputType: Tel,
+                },
+                Button.view {
+                    label: "Send code",
+                    href: Auth.Login.Route.encode ClickedSendCode,
+                    target: "#app",
+                },
             ],
     ]
 
@@ -68,7 +75,11 @@ viewVerifyCode = Html.div
             [
                 Typography.view { text: "Enter the code sent to your phone" },
                 TextField.view { label: "Code", inputType: Tel },
-                Button.view { label: "Verify code", href: Auth.Login.Route.encode ClickedVerifyCode },
+                Button.view {
+                    label: "Verify code",
+                    href: Auth.Login.Route.encode ClickedVerifyCode,
+                    target: "#app",
+                },
             ],
     ]
 
@@ -85,6 +96,10 @@ viewVerifiedCode = Html.div
             ]
             [
                 Typography.view { text: "Logged in" },
-                Button.view { label: "Go home", href: "/home" },
+                Button.view {
+                    label: "Go home",
+                    href: "/home",
+                    target: "#app",
+                },
             ],
     ]

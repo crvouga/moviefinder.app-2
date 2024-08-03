@@ -5,11 +5,12 @@ module [
 import Html
 import Html.Attr as Attr
 import Ui.Button
-# import Ui.TopBar as TopBar
+import Ui.Icon as Icon
 import Response
 import pf.Task
 import Ctx
 import Account.Route
+import Ui.Typography as Typography
 import Route
 import App.BottomNavigation as BottomNavigation
 
@@ -32,12 +33,19 @@ view =
     Html.div [Attr.class "w-full h-full flex flex-col"] [
         Html.div
             [
-                Attr.class "w-full flex-1 flex items-center justify-center",
+                Attr.class "w-full flex-1 flex items-center justify-center flex-col gap-2",
             ]
             [
+                Icon.doorOpen { class: "size-20" },
+                Typography.view {
+                    text: "Login to access your account",
+                    class: "font-bold text-xl",
+                    variant: H2,
+                },
                 Ui.Button.view {
                     label: "Login",
                     href: Route.encode (Login SendCode),
+                    target: "#app",
                 },
             ],
         BottomNavigation.view Account,
