@@ -9,12 +9,17 @@ import pf.Task
 import Ctx
 import Feed.Route
 import Media
-import App.BottomNavigation as BottomNavigation
+import Hx
+import Ui.Spinner
+import App.BottomNavigation
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
         Feed ->
+            viewFeed |> Response.html |> Task.ok
+
+        FeedItems ->
             queried =
                 ctx.mediaDb.query! {
                     limit: 0,
@@ -22,19 +27,31 @@ routeHx = \ctx, route ->
                     orderBy: Asc MediaId,
                     where: And [],
                 }
-            queried.rows |> viewFeed |> Response.html |> Task.ok
+            queried.rows |> viewFeedItems |> Response.html |> Task.ok
 
-viewFeed : List Media.Media -> Html.Node
-viewFeed = \mediaList ->
+viewFeed : Html.Node
+viewFeed =
     Html.div [Attr.class "w-full h-full flex flex-col"] [
-        # TopBar.view { title: "Feed" },
         Html.div [Attr.class "w-full flex-1 overflow-y-scroll"] [
             Html.div
-                [Attr.class "flex flex-col w-full flex-1"]
-                (List.map mediaList viewFeedItem),
+                [
+                    Attr.class "flex items-center justify-center w-full h-full",
+                    Hx.swap OuterHtml,
+                    Hx.trigger Load,
+                    Hx.get (Feed.Route.encode FeedItems),
+                ]
+                [
+                    Ui.Spinner.view,
+                ],
         ],
-        BottomNavigation.view Home,
+        App.BottomNavigation.view Home,
     ]
+
+viewFeedItems : List Media.Media -> Html.Node
+viewFeedItems = \mediaList ->
+    Html.div
+        [Attr.class "flex flex-col w-full flex-1"]
+        (List.map mediaList viewFeedItem)
 
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
