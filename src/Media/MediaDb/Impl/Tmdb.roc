@@ -1,10 +1,8 @@
-module [baseUrl, Config, toBaseHeaders, toRequest, toBaseHeaders, TmdbConfig]
+module [baseUrl, toRequest, toBaseHeaders, TmdbConfig, getTmdbConfig]
 
+import pf.Task exposing [Task]
 import pf.Http
-
-Config : {
-    tmdbApiReadAccessToken : Str,
-}
+import Json exposing [decodeJsonWithFallback]
 
 baseUrl : Str
 baseUrl = "https://api.themoviedb.org/3"
@@ -45,3 +43,31 @@ TmdbConfig : {
     },
     changeKeys : List Str,
 }
+
+emptyTmdbConfig : TmdbConfig
+emptyTmdbConfig = {
+    images: {
+        baseUrl: "",
+        secureBaseUrl: "",
+        backdropSizes: [],
+        logoSizes: [],
+        posterSizes: [],
+        profileSizes: [],
+        stillSizes: [],
+    },
+    changeKeys: [],
+}
+
+# https://developer.themoviedb.org/reference/configuration-details
+getTmdbConfig :
+    {
+        tmdbApiReadAccessToken : Str,
+    }*
+    -> Task TmdbConfig []
+getTmdbConfig = \config ->
+    task =
+        response = Http.send! (toRequest config "/configuration")
+        tmdbConfig = decodeJsonWithFallback! (Str.toUtf8 response) emptyTmdbConfig
+        Task.ok tmdbConfig
+
+    task |> Task.onErr (\_ -> Task.ok emptyTmdbConfig)

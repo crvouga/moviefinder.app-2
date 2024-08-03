@@ -7,6 +7,7 @@ import Media exposing [Media]
 import Logger
 import Media.MediaDb.Impl.Tmdb as Tmdb
 import Json exposing [decodeJsonWithFallback]
+# import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -66,6 +67,7 @@ tmdbMovieToMedia = \tmdbMovie -> {
 
 query : Config -> MediaDbQuery
 query = \config -> \queryInput ->
+
         mediaList = getDiscoverMovie! config
 
         sliced =
