@@ -8,6 +8,7 @@ import Logger
 import Media.MediaDb.Impl.Tmdb as Tmdb
 import Json exposing [decodeJsonWithFallback]
 import ImageSet
+import MediaId
 import pf.Stdout
 
 Config : {
@@ -67,7 +68,7 @@ toPosterImageSet = \tmdbConfig, posterPath ->
 
 tmdbMovieToMedia : Tmdb.TmdbConfig, TmdbDiscoverMovieResult -> Media
 tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
-    mediaId: Num.toStr tmdbMovie.id,
+    mediaId: tmdbMovie.id |> Num.toStr |> MediaId.fromStr,
     mediaTitle: tmdbMovie.title,
     mediaDescription: tmdbMovie.overview,
     mediaType: Movie,
