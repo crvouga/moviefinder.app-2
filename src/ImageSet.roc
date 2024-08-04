@@ -18,4 +18,3 @@ mediumRes = \@ImageSet imageSet ->
 
 lowestRes : ImageSet -> Str
 lowestRes = \@ImageSet imageSet -> List.first imageSet |> Result.withDefault ""
-

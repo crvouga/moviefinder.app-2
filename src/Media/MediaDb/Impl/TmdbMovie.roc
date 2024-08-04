@@ -10,8 +10,9 @@ import Json
 import ImageSet
 import MediaId
 # import MediaType
+import MediaVideo
 import Url
-import pf.Stdout
+# import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -92,6 +93,7 @@ tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
     mediaType: Movie,
     mediaPoster: toPosterImageSet tmdbConfig tmdbMovie.posterPath,
     mediaBackdrop: toBackdropImageSet tmdbConfig tmdbMovie.backdropPath,
+    mediaVideos: [],
 }
 
 query : Config -> MediaDbQuery
@@ -112,6 +114,20 @@ emptyMedia = {
     mediaType: Movie,
     mediaPoster: ImageSet.init { lowestResFirst: [] },
     mediaBackdrop: ImageSet.init { lowestResFirst: [] },
+    mediaVideos: [],
+}
+
+TmdbVideo : {
+    iso6391 : Str,
+    iso31661 : Str,
+    name : Str,
+    key : Str,
+    site : Str,
+    size : U32,
+    type : Str,
+    official : Bool,
+    publishedAt : Str,
+    id : Str,
 }
 
 TmdbMovieDetails : {
@@ -155,21 +171,18 @@ TmdbMovieDetails : {
     # video : Bool,
     # voteAverage : F32,
     # voteCount : U32,
-    # videos : {
-    #     results : List {
-    #         iso6391 : Str,
-    #         iso31661 : Str,
-    #         name : Str,
-    #         key : Str,
-    #         site : Str,
-    #         size : U32,
-    #         type : Str,
-    #         official : Bool,
-    #         publishedAt : Str,
-    #         id : Str,
-    #     },
-    # },
+    videos : {
+        results : List TmdbVideo,
+    },
 }
+
+tmdbVideoToMediaVideo : TmdbVideo -> MediaVideo.MediaVideo
+tmdbVideoToMediaVideo = \tmdbVideo -> MediaVideo.init {
+        id: tmdbVideo.id,
+        youtubeId: tmdbVideo.key,
+        name: tmdbVideo.name,
+    }
+
 tmdbMovieDetailsToMedia : Tmdb.TmdbConfig, TmdbMovieDetails -> Media
 tmdbMovieDetailsToMedia = \tmdbConfig, tmdbMovieDetails -> {
     mediaId: tmdbMovieDetails.id |> Num.toStr |> MediaId.fromStr,
@@ -178,6 +191,7 @@ tmdbMovieDetailsToMedia = \tmdbConfig, tmdbMovieDetails -> {
     mediaType: Movie,
     mediaPoster: toPosterImageSet tmdbConfig tmdbMovieDetails.posterPath,
     mediaBackdrop: toBackdropImageSet tmdbConfig tmdbMovieDetails.backdropPath,
+    mediaVideos: List.map tmdbMovieDetails.videos.results tmdbVideoToMediaVideo,
 }
 
 getMovieDetails : Config, MediaId.MediaId -> Task Media [NotFound]
@@ -193,7 +207,7 @@ getMovieDetails = \config, mediaId ->
         response = Http.send! (Tmdb.toRequest config url)
 
         decoded = Json.decode (Str.toUtf8 response)
-        Stdout.line! (Inspect.toStr decoded)
+        # Stdout.line! (Inspect.toStr decoded)
 
         when decoded is
             Ok movieDetails ->

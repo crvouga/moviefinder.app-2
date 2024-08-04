@@ -2,9 +2,13 @@ module [view]
 
 import Html
 
-scrollbarStyles : Str
-scrollbarStyles =
+styles : Str
+styles =
     """
+    html {
+        font-family: \"Inter\", sans-serif;
+    }
+        
     ::-webkit-scrollbar {
         width: 0px;
         height: 0px;
@@ -32,4 +36,4 @@ scrollbarStyles =
 
 view : Html.Node
 view =
-    Html.style [] [Html.text scrollbarStyles]
+    Html.style [] [Html.text styles]

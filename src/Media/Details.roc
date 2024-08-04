@@ -17,6 +17,7 @@ import Ui.Typography
 # import Ui.Topbar
 import ImageSet
 import Ui.Spinner
+import MediaVideo
 
 routeHx : Ctx.Ctx, Media.Details.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -26,6 +27,8 @@ routeHx = \ctx, route ->
 
         DetailsLoad mediaQuery ->
             queried <- (ctx.mediaDb.findById mediaQuery.mediaId mediaQuery.mediaType) |> Task.attempt
+
+            # ctx.logger.info! (Inspect.toStr queried)
 
             when queried is
                 Ok media ->
@@ -52,7 +55,7 @@ viewDetailsLoading = \mediaQuery -> Html.div
 viewDetails : Media.Media -> Html.Node
 viewDetails = \media -> Html.div
         [
-            Attr.class "w-full h-full flex flex-col",
+            Attr.class "w-full h-full flex flex-col overflow-y-scroll",
         ]
         [
             # Ui.Topbar.view { title: media.mediaTitle },
@@ -75,6 +78,51 @@ viewDetails = \media -> Html.div
                         variant: Body,
                         text: media.mediaDescription,
                         class: "text-center text-sm opacity-80",
+                    },
+                ],
+            viewMediaVideos media,
+        ]
+
+viewMediaVideos : Media.Media -> Html.Node
+viewMediaVideos = \media -> Html.div
+        [
+            Attr.class "w-full h-full flex flex-col",
+        ]
+        [
+            Ui.Typography.view {
+                variant: H2,
+                text: "Videos",
+                class: "text-3xl font-bold p-4",
+            },
+            Html.div [] (List.map media.mediaVideos viewMediaVideo),
+        ]
+
+viewMediaVideo : MediaVideo.MediaVideo -> Html.Node
+viewMediaVideo = \mediaVideo -> Html.button
+        [
+            Attr.class "w-full flex items-center justify-center",
+        ]
+        [
+            Html.div
+                [
+                    Attr.class "aspect-video w-32 overflow-hidden",
+                ]
+                [
+                    Ui.Image.view [
+                        Attr.src (ImageSet.highestRes mediaVideo.thumbnail),
+                        Attr.alt " ",
+                        Attr.class "w-full h-full object-cover",
+                    ],
+                ],
+            Html.div
+                [
+                    Attr.class "flex-1 p-4 gap-4 flex flex-col truncate",
+                ]
+                [
+                    Ui.Typography.view {
+                        variant: Body,
+                        text: mediaVideo.name,
+                        class: "text-center text-sm opacity-80 truncate",
                     },
                 ],
         ]
