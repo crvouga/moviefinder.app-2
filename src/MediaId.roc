@@ -1,9 +1,9 @@
 module [MediaId, fromStr, toStr]
 
-MediaId := Str
+MediaId : Str
 
 fromStr : Str -> MediaId
-fromStr = \str -> @MediaId str
+fromStr = \str -> str
 
 toStr : MediaId -> Str
-toStr = \@MediaId mediaId -> mediaId
+toStr = \mediaId -> mediaId

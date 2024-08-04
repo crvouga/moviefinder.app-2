@@ -1,6 +1,6 @@
 module [ImageSet, highestRes, init, mediumRes, lowestRes, empty]
 
-ImageSet := List Str
+ImageSet := List Str implements [Decoding, Encoding, Eq, Inspect]
 
 empty : ImageSet
 empty = @ImageSet []

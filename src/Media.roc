@@ -10,4 +10,5 @@ Media : {
     mediaDescription : Str,
     mediaType : MediaType.MediaType,
     mediaPoster : ImageSet.ImageSet,
+    mediaBackdrop : ImageSet.ImageSet,
 }

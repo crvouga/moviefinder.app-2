@@ -15,6 +15,7 @@ import Route
 import Account
 import Feed
 import App.Document
+import Media.Details
 
 main : Http.Request -> Task.Task Http.Response []
 main = \httpReq ->
@@ -45,6 +46,9 @@ routeHx = \ctx, req ->
 
         Account r ->
             Account.routeHx ctx r
+
+        Media r ->
+            Media.Details.routeHx ctx r
 
         Index | RobotsTxt ->
             Route.init |> Response.redirect |> Task.ok

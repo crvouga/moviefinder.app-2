@@ -16,6 +16,7 @@ import App.BottomNavigation
 import ImageSet
 import Ui.Swiper
 import Ui.Image
+import App.Link
 
 defaultMediaQuery : {
     limit : U64,
@@ -92,8 +93,13 @@ viewFeedItems = \mediaList, mediaQuery ->
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
     Ui.Swiper.slide [] [
-        Ui.Image.view [
-            Attr.class "w-full h-full object-cover",
-            Attr.src (ImageSet.highestRes media.mediaPoster),
-        ],
+        App.Link.view
+            (Media (Details { mediaId: media.mediaId, mediaType: media.mediaType }))
+            []
+            [
+                Ui.Image.view [
+                    Attr.class "w-full h-full object-cover",
+                    Attr.src (ImageSet.highestRes media.mediaPoster),
+                ],
+            ],
     ]
