@@ -53,11 +53,12 @@ viewFeed =
 
 viewFeedItemLoadMore : Html.Node
 viewFeedItemLoadMore =
-    Html.div
+
+    Ui.Swiper.slide
         [
             Attr.class "w-full h-full flex items-center justify-center",
             Hx.swap OuterHtml,
-            Hx.trigger Load,
+            Hx.trigger Intersect,
             Hx.get (Feed.Route.encode FeedItems),
         ]
         [
@@ -67,19 +68,13 @@ viewFeedItemLoadMore =
 viewFeedItems : List Media.Media -> Html.Node
 viewFeedItems = \mediaList ->
     Html.fragment
-        (List.map mediaList viewFeedItem)
+        (List.concat (List.map mediaList viewFeedItem) [viewFeedItemLoadMore])
 
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
-    Ui.Swiper.slide [
-        Html.div
-            [
-                Attr.class "w-full h-full",
-            ]
-            [
-                Html.img [
-                    Attr.class "w-full h-full object-cover",
-                    Attr.src (ImageSet.highestRes media.mediaPoster),
-                ],
-            ],
+    Ui.Swiper.slide [] [
+        Html.img [
+            Attr.class "w-full h-full object-cover",
+            Attr.src (ImageSet.highestRes media.mediaPoster),
+        ],
     ]

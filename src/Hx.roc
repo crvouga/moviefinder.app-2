@@ -16,7 +16,7 @@ swapValueToStr = \swapValue ->
 swap : SwapValue -> Attr.Attribute
 swap = \swapValue -> swapValue |> swapValueToStr |> (Attr.attribute "hx-swap")
 
-TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress]
+TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress, Revealed, Intersect]
 
 triggerValueToStr : TriggerValue -> Str
 triggerValueToStr = \triggerValue ->
@@ -29,6 +29,8 @@ triggerValueToStr = \triggerValue ->
         Keyup -> "keyup"
         Keydown -> "keydown"
         Keypress -> "keypress"
+        Revealed -> "revealed"
+        Intersect -> "intersect"
 
 trigger : TriggerValue -> Attr.Attribute
 trigger = \triggerValue -> triggerValue |> triggerValueToStr |> (Attr.attribute "hx-trigger")

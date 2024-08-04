@@ -33,6 +33,6 @@ container = \{ slidesPerView ? 1, direction ? Vertical, classList ? [] }, childr
 
 swiperSlide = Html.element "swiper-slide"
 
-slide : List Html.Node -> Html.Node
-slide = \children ->
-    swiperSlide [] children
+slide : List Attr.Attribute, List Html.Node -> Html.Node
+slide = \attr, children ->
+    swiperSlide attr children
