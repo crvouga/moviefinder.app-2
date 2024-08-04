@@ -53,7 +53,6 @@ viewFeed =
 
 viewFeedItemLoadMore : Html.Node
 viewFeedItemLoadMore =
-
     Ui.Swiper.slide
         [
             Attr.class "w-full h-full flex items-center justify-center",
