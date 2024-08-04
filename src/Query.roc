@@ -2,14 +2,14 @@ module [Query, OrderBy, OrderByDirection, Where, todoQuery, mediaQuery]
 
 OrderByDirection : [Asc, Desc]
 
-Query field : {
+Query a : {
     limit : U64,
     offset : U64,
-    orderBy : OrderBy field,
-    where : Where field,
-}
+    orderBy : OrderBy a,
+    where : Where a,
+} where a implements Eq
 
-OrderBy a : [Asc a, Desc a]
+OrderBy a : [Asc a, Desc a] where a implements Eq
 
 Where a : [
     And (List (Where a)),
@@ -19,7 +19,7 @@ Where a : [
     EqStr a Str,
     Like a Str,
     Gte a F64,
-]
+] where a implements Eq
 
 #
 #

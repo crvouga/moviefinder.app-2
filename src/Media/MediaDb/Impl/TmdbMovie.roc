@@ -9,7 +9,7 @@ import Media.MediaDb.Impl.Tmdb as Tmdb
 import Json exposing [decodeJsonWithFallback]
 import ImageSet
 import MediaId
-import pf.Stdout
+# import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -52,7 +52,6 @@ getDiscoverMovie : Config -> Task (List Media) []
 getDiscoverMovie = \config ->
     task =
         tmdbConfig = Tmdb.getTmdbConfig! config
-        Stdout.line! (Inspect.toStr tmdbConfig)
         response = Http.send! (Tmdb.toRequest config "/discover/movie")
         discoverMovieResult = decodeJsonWithFallback! (Str.toUtf8 response) emptyResult
         mediaList = List.map discoverMovieResult.results \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
@@ -81,6 +80,8 @@ query = \config -> \queryInput ->
 
         sliced =
             mediaList
+            |> List.dropFirst queryInput.offset
+            |> List.takeFirst queryInput.limit
 
         Task.ok {
             rows: sliced,

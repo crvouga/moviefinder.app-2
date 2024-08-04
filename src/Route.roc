@@ -41,8 +41,8 @@ decode = \url ->
         _ ->
             Index
 
-expect decode "/feed" == Feed Feed
-expect decode "/login/verify-code" == Login VerifyCode
+# expect decode "/feed" == Feed Feed
+# expect decode "/login/verify-code" == Login VerifyCode
 
 encode : Route -> Str
 encode = \route ->

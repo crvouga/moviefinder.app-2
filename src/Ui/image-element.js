@@ -1,9 +1,9 @@
 class SkeletonImage extends HTMLElement {
   constructor() {
     super();
-    const shadow = this.attachShadow({ mode: "open" });
+    const shadow = this.attachShadow({ mode: `open` });
 
-    const style = document.createElement("style");
+    const style = document.createElement(`style`);
     style.textContent = `
       .skeleton {
         width: 100%;
@@ -33,12 +33,12 @@ class SkeletonImage extends HTMLElement {
       }
     `;
 
-    this.skeleton = document.createElement("div");
-    this.skeleton.className = "skeleton";
+    this.skeleton = document.createElement(`div`);
+    this.skeleton.className = `skeleton`;
 
-    this.image = document.createElement("img");
-    this.image.className = "image";
-    this.image.alt = this.getAttribute("alt") || "";
+    this.image = document.createElement(`img`);
+    this.image.className = `image`;
+    this.image.alt = this.getAttribute(`alt`) || ``;
 
     shadow.appendChild(style);
     shadow.appendChild(this.skeleton);
@@ -46,18 +46,18 @@ class SkeletonImage extends HTMLElement {
   }
 
   connectedCallback() {
-    this.image.src = this.getAttribute("src");
-    this.image.addEventListener("load", () => this.onImageLoaded());
+    this.image.src = this.getAttribute(`src`);
+    this.image.addEventListener(`load`, () => this.onImageLoaded());
   }
 
   disconnectedCallback() {
-    this.image.removeEventListener("load", () => this.onImageLoaded());
+    this.image.removeEventListener(`load`, () => this.onImageLoaded());
   }
 
   onImageLoaded() {
-    this.skeleton.style.display = "none";
-    this.image.style.display = "block";
+    this.skeleton.style.display = `none`;
+    this.image.style.display = `block`;
   }
 }
 
-customElements.define("skeleton-image", SkeletonImage);
+customElements.define(`skeleton-image`, SkeletonImage);

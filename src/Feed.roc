@@ -14,6 +14,15 @@ import Ui.Spinner
 import App.BottomNavigation
 import ImageSet
 import Ui.Swiper
+import Media.MediaDb exposing [MediaQuery]
+
+defaultMediaQuery : MediaQuery
+defaultMediaQuery = {
+    limit: 10,
+    offset: 0,
+    orderBy: Asc MediaId,
+    where: And [],
+}
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -21,15 +30,10 @@ routeHx = \ctx, route ->
         Feed ->
             viewFeed |> Response.html |> Task.ok
 
-        FeedItems ->
+        FeedItems mediaQuery ->
             queried =
-                ctx.mediaDb.query! {
-                    limit: 0,
-                    offset: 10,
-                    orderBy: Asc MediaId,
-                    where: And [],
-                }
-            queried.rows |> viewFeedItems |> Response.html |> Task.ok
+                ctx.mediaDb.query! mediaQuery
+            queried.rows |> viewFeedItems mediaQuery |> Response.html |> Task.ok
 
 viewFeed : Html.Node
 viewFeed =
@@ -41,7 +45,7 @@ viewFeed =
                         Attr.class "flex items-center justify-center w-full h-full",
                         Hx.swap OuterHtml,
                         Hx.trigger Load,
-                        Hx.get (Feed.Route.encode FeedItems),
+                        Hx.get (Feed.Route.encode (FeedItems defaultMediaQuery)),
                     ]
                     [
                         Ui.Spinner.view,
@@ -51,23 +55,23 @@ viewFeed =
         App.BottomNavigation.view Home,
     ]
 
-viewFeedItemLoadMore : Html.Node
-viewFeedItemLoadMore =
+viewFeedItemLoadMore : MediaQuery -> Html.Node
+viewFeedItemLoadMore = \mediaQuery ->
     Ui.Swiper.slide
         [
             Attr.class "w-full h-full flex items-center justify-center",
             Hx.swap OuterHtml,
             Hx.trigger Intersect,
-            Hx.get (Feed.Route.encode FeedItems),
+            Hx.get (Feed.Route.encode (FeedItems { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
         ]
         [
             Ui.Spinner.view,
         ]
 
-viewFeedItems : List Media.Media -> Html.Node
-viewFeedItems = \mediaList ->
+viewFeedItems : List Media.Media, MediaQuery -> Html.Node
+viewFeedItems = \mediaList, mediaQuery ->
     Html.fragment
-        (List.concat (List.map mediaList viewFeedItem) [viewFeedItemLoadMore])
+        (List.concat (List.map mediaList viewFeedItem) [viewFeedItemLoadMore mediaQuery])
 
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
