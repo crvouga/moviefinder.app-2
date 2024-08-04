@@ -19,25 +19,11 @@ variantToHtmlTag = \variant ->
         Overline -> "span"
         Subtitle -> "span"
 
-variantToClass : Variant -> Str
-variantToClass = \variant ->
-    when variant is
-        H1 -> "text-4xl font-bold"
-        H2 -> "text-3xl font-bold"
-        H3 -> "text-2xl font-bold"
-        H4 -> "text-xl font-bold"
-        H5 -> "text-lg font-bold"
-        H6 -> "text-base font-bold"
-        Body -> "text-base"
-        Caption -> "text-sm"
-        Overline -> "text-xs"
-        Subtitle -> "text-lg"
-
 view : { text : Str, variant ? Variant, class ? Str } -> Html.Node
 view = \{ text, variant ? Body, class ? "" } ->
     (Html.element (variantToHtmlTag variant))
         [
-            Attr.classList [variantToClass variant, class],
+            Attr.classList [class],
         ]
         [
             Html.text text,
