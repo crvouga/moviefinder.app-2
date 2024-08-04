@@ -1,14 +1,16 @@
 module [Route, encode, decode]
 
+import Url exposing [Url]
+
 Route : [Account]
 
-encode : Route -> Str
+encode : Route -> Url
 encode = \route ->
     when route is
-        Account -> "/account"
+        Account -> Url.fromStr "/account"
 
-decode : Str -> Route
-decode = \str ->
-    when str is
+decode : Url -> Route
+decode = \url ->
+    when Url.path url is
         "/account" -> Account
         _ -> Account

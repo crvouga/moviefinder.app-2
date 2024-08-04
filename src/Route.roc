@@ -1,7 +1,9 @@
 module [Route, encode, decode, init]
+
 import Auth.Login.Route
 import Feed.Route
 import Account.Route
+import Url exposing [Url]
 
 Route : [
     Index,
@@ -14,11 +16,11 @@ Route : [
 init : Route
 init = Feed Feed
 
-decode : Str -> Route
+decode : Url -> Route
 decode = \url ->
-    paths = toPaths url
     head =
-        paths
+        url
+        |> toPaths
         |> List.first
         |> \first -> Result.withDefault first "/"
 
@@ -41,10 +43,10 @@ decode = \url ->
         _ ->
             Index
 
-# expect decode "/feed" == Feed Feed
-# expect decode "/login/verify-code" == Login VerifyCode
+expect decode (Url.fromStr "/feed") == Feed Feed
+expect decode (Url.fromStr "/login/verify-code") == Login VerifyCode
 
-encode : Route -> Str
+encode : Route -> Url
 encode = \route ->
     when route is
         Login r ->
@@ -57,16 +59,17 @@ encode = \route ->
             Account.Route.encode r
 
         RobotsTxt ->
-            "/robots"
+            Url.fromStr "/robots"
 
         Index ->
-            "/"
+            Url.fromStr "/"
 
-toPaths : Str -> List Str
+toPaths : Url -> List Str
 toPaths = \url ->
-    (Str.split url "/")
-    |> \strs -> List.keepIf strs (\str -> str |> Str.isEmpty |> Bool.not)
-    |> \strs -> List.map strs (\str -> Str.withPrefix str "/")
+    Url.toStr url
+    |> Str.split "/"
+    |> List.keepIf (\s -> s |> Str.isEmpty |> Bool.not)
+    |> List.map (\s -> s |> Str.withPrefix "/")
 
-expect toPaths "/auth" == ["/auth"]
-expect (toPaths "/auth/login/verify") == ["/auth", "/login", "/verify"]
+expect (toPaths (Url.fromStr "/auth")) == ["/auth"]
+expect (toPaths (Url.fromStr "/auth/login/verify")) == ["/auth", "/login", "/verify"]

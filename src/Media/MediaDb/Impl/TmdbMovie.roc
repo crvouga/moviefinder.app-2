@@ -2,13 +2,14 @@ module [init, Config, getDiscoverMovie]
 
 import pf.Task exposing [Task]
 import pf.Http
-import Media.MediaDb exposing [MediaDb, MediaDbQuery]
+import Media.MediaDb exposing [MediaDb, MediaDbQuery, MediaQuery]
 import Media exposing [Media]
 import Logger
 import Media.MediaDb.Impl.Tmdb as Tmdb
-import Json exposing [decodeJsonWithFallback]
+import Json
 import ImageSet
 import MediaId
+import Url
 # import pf.Stdout
 
 Config : {
@@ -48,13 +49,24 @@ emptyResult = {
     results: [],
 }
 
-getDiscoverMovie : Config -> Task (List Media) []
-getDiscoverMovie = \config ->
+getDiscoverMovie : Config, MediaQuery -> Task (List Media) []
+getDiscoverMovie = \config, mediaQuery ->
     task =
+        page = mediaQuery.offset // mediaQuery.limit + 1
+        url =
+            # https://developer.themoviedb.org/reference/discover-movie
+            "/discover/movie"
+            |> Url.fromStr
+            |> Url.appendParam "page" (page |> Num.toStr)
+            |> Url.toStr
+
+        response = Http.send! (Tmdb.toRequest config url)
+        discoverMovieResult = Json.decodeWithFallback (Str.toUtf8 response) emptyResult
+
         tmdbConfig = Tmdb.getTmdbConfig! config
-        response = Http.send! (Tmdb.toRequest config "/discover/movie")
-        discoverMovieResult = decodeJsonWithFallback! (Str.toUtf8 response) emptyResult
+
         mediaList = List.map discoverMovieResult.results \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
+
         Task.ok mediaList
 
     task |> Task.onErr (\_ -> Task.ok [])
@@ -76,18 +88,13 @@ tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
 
 query : Config -> MediaDbQuery
 query = \config -> \queryInput ->
-        mediaList = getDiscoverMovie! config
-
-        sliced =
-            mediaList
-            |> List.dropFirst queryInput.offset
-            |> List.takeFirst queryInput.limit
+        rows = getDiscoverMovie! config queryInput
 
         Task.ok {
-            rows: sliced,
             limit: queryInput.limit,
             offset: queryInput.offset,
-            total: List.len mediaList,
+            total: List.len rows,
+            rows,
         }
 
 init : Config -> MediaDb

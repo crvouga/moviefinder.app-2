@@ -9,20 +9,21 @@ import pf.Task
 import Ctx
 import Feed.Route
 import Media
+# import pf.Stdout
 import Hx
 import Ui.Spinner
 import App.BottomNavigation
 import ImageSet
 import Ui.Swiper
-import Media.MediaDb exposing [MediaQuery]
 import Ui.Image
 
-defaultMediaQuery : MediaQuery
+defaultMediaQuery : {
+    limit : U64,
+    offset : U64,
+}
 defaultMediaQuery = {
-    limit: 10,
+    limit: 20,
     offset: 0,
-    orderBy: Asc MediaId,
-    where: And [],
 }
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
@@ -33,7 +34,12 @@ routeHx = \ctx, route ->
 
         FeedItems mediaQuery ->
             queried =
-                ctx.mediaDb.query! mediaQuery
+                ctx.mediaDb.query! {
+                    limit: mediaQuery.limit,
+                    offset: mediaQuery.offset,
+                    orderBy: Desc MediaId,
+                    where: And [],
+                }
             queried.rows |> viewFeedItems mediaQuery |> Response.html |> Task.ok
 
 viewFeed : Html.Node
@@ -56,7 +62,7 @@ viewFeed =
         App.BottomNavigation.view Home,
     ]
 
-viewFeedItemLoadMore : MediaQuery -> Html.Node
+viewFeedItemLoadMore : { limit : U64, offset : U64 } -> Html.Node
 viewFeedItemLoadMore = \mediaQuery ->
     Ui.Swiper.slide
         [
@@ -69,10 +75,19 @@ viewFeedItemLoadMore = \mediaQuery ->
             Ui.Spinner.view,
         ]
 
-viewFeedItems : List Media.Media, MediaQuery -> Html.Node
+viewFeedItems : List Media.Media, { limit : U64, offset : U64 } -> Html.Node
 viewFeedItems = \mediaList, mediaQuery ->
     Html.fragment
-        (List.concat (List.map mediaList viewFeedItem) [viewFeedItemLoadMore mediaQuery])
+        (
+            List.concat
+                (List.map mediaList viewFeedItem)
+                (
+                    if (List.len mediaList) > 0 then
+                        [viewFeedItemLoadMore mediaQuery]
+                    else
+                        []
+                )
+        )
 
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->

@@ -9,6 +9,7 @@ module [
 import pf.Http
 import Html
 import Route
+import Url
 
 Response : [
     Html Html.Node,
@@ -58,8 +59,8 @@ toHttp = \res ->
             {
                 status: 302,
                 headers: [
-                    httpHeader "Location" url,
-                    httpHeader "Hx-Push-Url" url,
+                    httpHeader "Location" (Url.toStr url),
+                    httpHeader "Hx-Push-Url" (Url.toStr url),
                 ],
                 body: Str.toUtf8 "",
             }

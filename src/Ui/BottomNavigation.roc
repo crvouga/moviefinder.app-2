@@ -4,11 +4,13 @@ import Html
 import Html.Attr as Attr
 import Hx
 
+import Url exposing [Url]
+
 Action a : {
     label : Str,
     icon : Html.Node,
     value : a,
-    href : Str,
+    href : Url,
 }
 
 viewAction : { action : Action a, target : Str, selected : Bool } -> Html.Node
@@ -24,7 +26,7 @@ viewAction = \input ->
             ],
             Hx.target input.target,
             Hx.swap InnerHtml,
-            Attr.href input.action.href,
+            Attr.href (Url.toStr input.action.href),
         ]
         [
             input.action.icon,

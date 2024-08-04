@@ -2,6 +2,7 @@ module [swap, trigger, get, boost, target, isReq]
 
 import Html.Attr as Attr
 import pf.Http
+import Url exposing [Url]
 
 SwapValue : [InnerHtml, OuterHtml, InnerText, OuterText]
 
@@ -35,8 +36,8 @@ triggerValueToStr = \triggerValue ->
 trigger : TriggerValue -> Attr.Attribute
 trigger = \triggerValue -> triggerValue |> triggerValueToStr |> (Attr.attribute "hx-trigger")
 
-get : Str -> Attr.Attribute
-get = Attr.attribute "hx-get"
+get : Url -> Attr.Attribute
+get = \url -> (Attr.attribute "hx-get") (Url.toStr url)
 
 boolToHtmlBool : Bool.Bool -> Str
 boolToHtmlBool = \bool ->

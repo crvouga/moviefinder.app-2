@@ -1,19 +1,25 @@
-module [decodeJsonWithFallback]
+# https://lukewilliamboswell.github.io/roc-json/
+module [decodeWithFallback, encode]
 
-import pf.Task exposing [Task]
 import json.Json as JsonLib
 
-decodeJsonWithFallback : List U8, val -> Task.Task val [] where val implements Decoding
-decodeJsonWithFallback = \json, fallback ->
-    decoder = JsonLib.utf8With { fieldNameMapping: SnakeCase }
+decodeWithFallback : List U8, val -> val where val implements Decoding
+decodeWithFallback = \json, fallback ->
+    decoder = JsonLib.utf8With {
+        fieldNameMapping: SnakeCase,
+    }
 
     decoded = Decode.fromBytesPartial json decoder
 
     when decoded.result is
         Ok record ->
-            Task.ok record
+            record
 
         Err err ->
             when err is
                 TooShort ->
-                    Task.ok fallback
+                    fallback
+
+encode : val -> List U8 where val implements Encoding
+encode = \val ->
+    val |> Encode.toBytes JsonLib.utf8

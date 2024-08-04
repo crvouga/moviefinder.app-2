@@ -1,8 +1,8 @@
-module [baseUrl, toRequest, toBaseHeaders, TmdbConfig, getTmdbConfig]
+module [baseUrl, toRequest, toBaseHeaders, TmdbConfig, getTmdbConfig, pageSize]
 
 import pf.Task exposing [Task]
 import pf.Http
-import Json exposing [decodeJsonWithFallback]
+import Json
 
 baseUrl : Str
 baseUrl = "https://api.themoviedb.org/3"
@@ -29,6 +29,9 @@ toRequest = \config, path -> { Http.defaultRequest &
         headers: toBaseHeaders config,
         url: "$(baseUrl)$(path)",
     }
+
+pageSize : I32
+pageSize = 20
 
 # https://developer.themoviedb.org/reference/configuration-details
 TmdbConfig : {
@@ -67,7 +70,7 @@ getTmdbConfig :
 getTmdbConfig = \config ->
     task =
         response = Http.send! (toRequest config "/configuration")
-        tmdbConfig = decodeJsonWithFallback! (Str.toUtf8 response) emptyTmdbConfig
+        tmdbConfig = Json.decodeWithFallback (Str.toUtf8 response) emptyTmdbConfig
         Task.ok tmdbConfig
 
     task |> Task.onErr (\_ -> Task.ok emptyTmdbConfig)

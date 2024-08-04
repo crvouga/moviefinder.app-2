@@ -10,6 +10,7 @@ import Ui.Button as Button
 import Ui.Typography as Typography
 import Ctx
 import Auth.Login.Route
+import Route
 
 routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -98,7 +99,7 @@ viewVerifiedCode = Html.div
                 Typography.view { text: "Logged in" },
                 Button.view {
                     label: "Go home",
-                    href: "/home",
+                    href: (Feed Feed) |> Route.encode,
                     target: "#app",
                 },
             ],
