@@ -15,6 +15,7 @@ import App.BottomNavigation
 import ImageSet
 import Ui.Swiper
 import Media.MediaDb exposing [MediaQuery]
+import Ui.Image
 
 defaultMediaQuery : MediaQuery
 defaultMediaQuery = {
@@ -76,7 +77,7 @@ viewFeedItems = \mediaList, mediaQuery ->
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
     Ui.Swiper.slide [] [
-        Html.img [
+        Ui.Image.view [
             Attr.class "w-full h-full object-cover",
             Attr.src (ImageSet.highestRes media.mediaPoster),
         ],

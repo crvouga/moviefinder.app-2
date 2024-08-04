@@ -23,7 +23,7 @@ view = \{ route } ->
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
                 Html.script [Attr.src "https://unpkg.com/htmx.org@2.0.1", Attr.defer "true"] [],
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js", Attr.defer "true"] [],
-                Html.script [] [Html.text imageElementJs],
+                Html.script [] [Html.dangerouslyIncludeUnescapedHtml imageElementJs],
                 App.Styles.view,
             ],
         Html.body

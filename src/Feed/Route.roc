@@ -17,5 +17,3 @@ decode = \str ->
         "/feed/feed-items" -> FeedItems { limit: 10, offset: 0, orderBy: Asc MediaId, where: And [] }
         _ -> Feed
 
-
-        
