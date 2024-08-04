@@ -92,14 +92,20 @@ viewFeedItems = \mediaList, mediaQuery ->
 
 viewFeedItem : Media.Media -> Html.Node
 viewFeedItem = \media ->
-    Ui.Swiper.slide [] [
-        App.Link.view
-            (Media (Details { mediaId: media.mediaId, mediaType: media.mediaType }))
-            []
-            [
-                Ui.Image.view [
-                    Attr.class "w-full h-full object-cover",
-                    Attr.src (ImageSet.highestRes media.mediaPoster),
+    Ui.Swiper.slide
+        [
+            Attr.class "w-full h-full flex flex-col items-center justify-center",
+        ]
+        [
+            App.Link.view
+                (Media (Details { mediaId: media.mediaId, mediaType: media.mediaType }))
+                [
+                    Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center",
+                ]
+                [
+                    Ui.Image.view [
+                        Attr.class "w-full h-full object-cover",
+                        Attr.src (ImageSet.highestRes media.mediaPoster),
+                    ],
                 ],
-            ],
-    ]
+        ]

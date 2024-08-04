@@ -18,6 +18,7 @@ import Ui.Typography
 import ImageSet
 import Ui.Spinner
 import MediaVideo
+# import pf.Sleep
 
 routeHx : Ctx.Ctx, Media.Details.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -26,9 +27,8 @@ routeHx = \ctx, route ->
             viewDetailsLoading mediaQuery |> Response.html |> Task.ok
 
         DetailsLoad mediaQuery ->
+            # Sleep.millis! 10000
             queried <- (ctx.mediaDb.findById mediaQuery.mediaId mediaQuery.mediaType) |> Task.attempt
-
-            # ctx.logger.info! (Inspect.toStr queried)
 
             when queried is
                 Ok media ->
@@ -49,13 +49,24 @@ viewDetailsLoading = \mediaQuery -> Html.div
             Hx.get (Media.Details.Route.encode (DetailsLoad mediaQuery)),
         ]
         [
-            Ui.Spinner.view,
+            Ui.Image.view [
+                Attr.src " ",
+                Attr.alt " ",
+                Attr.class "w-full aspect-video",
+            ],
+            Html.div
+                [
+                    Attr.class "w-full flex flex-1 flex-col items-center justify-start p-8",
+                ]
+                [
+                    Ui.Spinner.view,
+                ],
         ]
 
 viewDetails : Media.Media -> Html.Node
 viewDetails = \media -> Html.div
         [
-            Attr.class "w-full h-full flex flex-col overflow-y-scroll",
+            Attr.class "w-full h-full flex flex-col overflow-y-auto",
         ]
         [
             # Ui.Topbar.view { title: media.mediaTitle },
@@ -84,18 +95,22 @@ viewDetails = \media -> Html.div
         ]
 
 viewMediaVideos : Media.Media -> Html.Node
-viewMediaVideos = \media -> Html.div
-        [
-            Attr.class "w-full h-full flex flex-col",
-        ]
-        [
-            Ui.Typography.view {
-                variant: H2,
-                text: "Videos",
-                class: "text-3xl font-bold p-4",
-            },
-            Html.div [] (List.map media.mediaVideos viewMediaVideo),
-        ]
+viewMediaVideos = \media ->
+    if List.len media.mediaVideos == 0 then
+        Html.fragment []
+    else
+        Html.div
+            [
+                Attr.class "w-full h-full flex flex-col",
+            ]
+            [
+                Ui.Typography.view {
+                    variant: H2,
+                    text: "Videos",
+                    class: "text-3xl font-bold p-4",
+                },
+                Html.div [] (List.map media.mediaVideos viewMediaVideo),
+            ]
 
 viewMediaVideo : MediaVideo.MediaVideo -> Html.Node
 viewMediaVideo = \mediaVideo -> Html.button
