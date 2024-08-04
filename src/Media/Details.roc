@@ -122,7 +122,7 @@ viewMediaVideo = \mediaVideo -> Html.button
                     Ui.Typography.view {
                         variant: Body,
                         text: mediaVideo.name,
-                        class: "text-center text-sm opacity-80 truncate",
+                        class: "text-left text-sm opacity-80 truncate",
                     },
                 ],
         ]
