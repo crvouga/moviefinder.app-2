@@ -9,7 +9,7 @@ import PhoneNumber
 Config : {
     code : Str,
     logger : Logger.Logger,
-    
+
 }
 
 sendCode : Config -> VerifySms.SendCode
