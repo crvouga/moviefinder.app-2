@@ -5,7 +5,7 @@ import PhoneNumber exposing [PhoneNumber]
 
 SendCode : { phoneNumber : PhoneNumber } -> Task {} []
 
-VerifyCode : { phoneNumber : PhoneNumber, code : Str } -> Task {} [WrongCode]
+VerifyCode : { phoneNumber : PhoneNumber, code : Str } -> Task {} []
 
 VerifySms : {
     sendCode : SendCode,
