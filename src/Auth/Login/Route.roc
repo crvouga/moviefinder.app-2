@@ -3,7 +3,7 @@ module [Route, encode, decode]
 import Url exposing [Url]
 import PhoneNumber exposing [PhoneNumber]
 
-Route : [SendCode, ClickedSendCode, VerifyCode { phoneNumber : PhoneNumber }, ClickedVerifyCode { phoneNumber : PhoneNumber }, VerifiedCode]
+Route : [SendCode, ClickedSendCode, VerifyCode { phoneNumber : PhoneNumber, error : Str }, ClickedVerifyCode { phoneNumber : PhoneNumber }, VerifiedCode]
 
 appendParamPhoneNumber : Url, PhoneNumber -> Url
 appendParamPhoneNumber = \url, phoneNumber ->
@@ -27,7 +27,7 @@ decode = \url ->
             parsedPhoneNumber = url |> Url.queryParams |> Dict.get "phoneNumber" |> Result.withDefault "" |> PhoneNumber.fromUrlSafeStr
             when parsedPhoneNumber is
                 Err InvalidPhoneNumber -> SendCode
-                Ok phoneNumber -> VerifyCode { phoneNumber }
+                Ok phoneNumber -> VerifyCode { phoneNumber, error: "" }
 
         "/login/clicked-verify-code" ->
             parsedPhoneNumber = url |> Url.queryParams |> Dict.get "phoneNumber" |> Result.withDefault "" |> PhoneNumber.fromUrlSafeStr

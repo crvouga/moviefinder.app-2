@@ -21,26 +21,30 @@ routeHx = \ctx, route ->
             viewSendCode |> Response.html |> Task.ok
 
         ClickedSendCode ->
-            handleClickedSendCode ctx
+            clickedSendCode ctx
 
         VerifyCode { phoneNumber } ->
             viewVerifyCode { phoneNumber } |> Response.html |> Task.ok
 
         ClickedVerifyCode { phoneNumber } ->
-            verifiedCode <- ctx.verifySms.verifyCode { phoneNumber, code: "123" } |> Task.attempt
-
-            when verifiedCode is
-                Ok _ ->
-                    Login VerifiedCode |> Response.redirect |> Task.ok
-
-                Err _ ->
-                    Login (VerifyCode { phoneNumber }) |> Response.redirect |> Task.ok
+            clickedVerifyCode ctx phoneNumber
 
         VerifiedCode ->
             viewVerifiedCode |> Response.html |> Task.ok
 
-handleClickedSendCode : Ctx.Ctx -> Task.Task Response.Response _
-handleClickedSendCode = \ctx ->
+clickedVerifyCode : Ctx.Ctx, PhoneNumber.PhoneNumber -> Task.Task Response.Response []
+clickedVerifyCode = \ctx, phoneNumber ->
+    verifiedCode <- ctx.verifySms.verifyCode { phoneNumber, code: "123" } |> Task.attempt
+
+    when verifiedCode is
+        Ok _ ->
+            Login VerifiedCode |> Response.redirect |> Task.ok
+
+        Err _ ->
+            (Login (VerifyCode { phoneNumber, error: "Something went wrong" })) |> Response.redirect |> Task.ok
+
+clickedSendCode : Ctx.Ctx -> Task.Task Response.Response *
+clickedSendCode = \ctx ->
     parsedPhoneNumber =
         ctx.req.formData
         |> Dict.get "phoneNumber"
@@ -56,10 +60,10 @@ handleClickedSendCode = \ctx ->
 
             when sent is
                 Ok _ ->
-                    Login (VerifyCode { phoneNumber }) |> Response.redirect |> Task.ok
+                    Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
 
                 Err _ ->
-                    Login (VerifyCode { phoneNumber }) |> Response.redirect |> Task.ok
+                    Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
 
 viewSendCode : Html.Node
 viewSendCode = Html.div

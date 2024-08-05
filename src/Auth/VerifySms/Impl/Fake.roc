@@ -14,13 +14,13 @@ Config : {
 sendCode : Config -> Auth.VerifySms.SendCode
 sendCode = \config -> \{ phoneNumber } ->
         Logger.info! config.logger "Sending code $(config.code) to phone number $(PhoneNumber.toStr phoneNumber)"
-        _ <- Sleep.millis 1000 |> Task.await
+        Sleep.millis! 1000
         Task.ok {}
 
 verifyCode : Config -> Auth.VerifySms.VerifyCode
 verifyCode = \config -> \{ phoneNumber, code } ->
         Logger.info! config.logger "Verifying code $(code) for phone number $(PhoneNumber.toStr phoneNumber)"
-        _ <- Sleep.millis 1000 |> Task.await
+        Sleep.millis! 1000
         if code != config.code then
             Task.ok {}
         else
