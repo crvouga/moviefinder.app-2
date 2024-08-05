@@ -1,18 +1,19 @@
-module [MediaVideo, init]
+module [MediaVideo, init, fromUrl, appendParams]
 
-import ImageSet
+import ImageSet exposing [ImageSet]
+import Url exposing [Url]
 
 MediaVideo : {
     id : Str,
     youtubeId : Str,
     youtubeEmbedUrl : Str,
     youtubeWatchUrl : Str,
-    thumbnail : ImageSet.ImageSet,
+    thumbnail : ImageSet,
     name : Str,
 }
 
 youtubeEmbedUrl : { youtubeId : Str } -> Str
-youtubeEmbedUrl = \{ youtubeId } -> "https://www.youtube.com/embed/$(youtubeId)"
+youtubeEmbedUrl = \{ youtubeId } -> "https://www.youtube.com/embed/$(youtubeId)?enablejsapi=1"
 
 youtubeWatchUrl : { youtubeId : Str } -> Str
 youtubeWatchUrl = \{ youtubeId } -> "https://www.youtube.com/watch?v=$(youtubeId)"
@@ -31,3 +32,18 @@ init = \{ id, youtubeId, name } -> {
         lowestResFirst: [youtubeThumbnailUrl youtubeId],
     },
 }
+
+appendParams : Url, MediaVideo -> Url
+appendParams = \url, mediaVideo ->
+    url
+    |> Url.appendParam "mediaVideoId" mediaVideo.id
+    |> Url.appendParam "mediaVideoName" mediaVideo.name
+    |> Url.appendParam "mediaVideoYoutubeId" mediaVideo.youtubeId
+
+fromUrl : Url -> MediaVideo
+fromUrl = \url ->
+    queryParams = Url.queryParams url
+    id = queryParams |> Dict.get "mediaVideoId" |> Result.withDefault ""
+    name = queryParams |> Dict.get "mediaVideoName" |> Result.withDefault ""
+    youtubeId = queryParams |> Dict.get "mediaVideoYoutubeId" |> Result.withDefault ""
+    init { id, youtubeId, name }

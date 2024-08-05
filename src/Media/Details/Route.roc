@@ -3,6 +3,7 @@ module [Route, encode, decode]
 import MediaId exposing [MediaId]
 import MediaType exposing [MediaType]
 import Url exposing [Url]
+import MediaVideo exposing [MediaVideo]
 
 MediaQuery : { mediaType : MediaType, mediaId : MediaId }
 
@@ -21,7 +22,7 @@ getParamsMediaQuery = \url ->
     mediaId = mediaIdStr |> MediaId.fromStr
     { mediaType, mediaId }
 
-Route : [Details MediaQuery, DetailsLoad MediaQuery, Unknown]
+Route : [Details MediaQuery, DetailsLoad MediaQuery, Unknown, Video MediaVideo]
 
 encode : Route -> Url
 encode = \route ->
@@ -36,6 +37,11 @@ encode = \route ->
             |> Url.fromStr
             |> appendParamsMediaQuery mediaQuery
 
+        Video mediaVideo ->
+            "/media/video"
+            |> Url.fromStr
+            |> MediaVideo.appendParams mediaVideo
+
         Unknown ->
             Url.fromStr "/"
 
@@ -49,5 +55,9 @@ decode = \url ->
         "/media/details" ->
             mediaQuery = getParamsMediaQuery url
             Details mediaQuery
+
+        "/media/video" ->
+            mediaVideo = MediaVideo.fromUrl url
+            Video mediaVideo
 
         _ -> Unknown

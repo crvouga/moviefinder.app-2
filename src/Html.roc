@@ -321,7 +321,7 @@ renderAttr = \buffer, Attribute key value ->
     |> SafeStr.concat (dangerouslyMarkSafe " ")
     |> SafeStr.concat (dangerouslyMarkSafe key)
     |> SafeStr.concat (dangerouslyMarkSafe "=\"")
-    |> SafeStr.concat (escape value)
+    |> SafeStr.concat (dangerouslyMarkSafe value)
     |> SafeStr.concat (dangerouslyMarkSafe "\"")
 
 # Content sectioning
