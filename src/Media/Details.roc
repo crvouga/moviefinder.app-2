@@ -124,19 +124,18 @@ jsRefVideoIframeId : MediaVideo.MediaVideo -> Str
 jsRefVideoIframeId = \video ->
     "iframe-$(video.youtubeId)"
 
-xEffectIframePauseEffect : MediaVideo.MediaVideo -> Str
-xEffectIframePauseEffect = \video ->
+xEffectPlayPauseVideo : MediaVideo.MediaVideo -> Str
+xEffectPlayPauseVideo = \video ->
     """
-    const iframe = $refs['$(jsRefVideoIframeId video)'];    
-    if(iframe && $(jsVideoYoutubeId) !== '$(video.youtubeId)') {
-        clearTimeout(timeout)
-        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
-    } else {
+    const iframe = $refs['$(jsRefVideoIframeId video)'];
+    clearInterval(timeoutsByYoutubeId['$(video.youtubeId)'])
+    if(iframe && videoYoutubeId === '$(video.youtubeId)') {
         iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
-        clearTimeout(timeout)
-        timeout = setTimeout(() => {
+        timeoutsByYoutubeId['$(video.youtubeId)'] = setTimeout(() => {
             iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
         }, 1000);
+    } else if(iframe) {
+        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
     }
     """
 
@@ -150,7 +149,7 @@ viewEmbeddedVideo = \mediaVideo -> Html.div
                 [
                     Attr.src mediaVideo.youtubeEmbedUrl,
                     X.ref (jsRefVideoIframeId mediaVideo),
-                    X.effect (xEffectIframePauseEffect mediaVideo),
+                    X.effect (xEffectPlayPauseVideo mediaVideo),
                     Attr.class "w-full h-full",
                     (Attr.attribute "frameborder") "0",
                     Attr.allow "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
@@ -159,19 +158,16 @@ viewEmbeddedVideo = \mediaVideo -> Html.div
                 [],
         ]
 
-jsVideoYoutubeId : Str
-jsVideoYoutubeId = "videoYoutubeId"
-
 jsIsVideoVisible : MediaVideo.MediaVideo -> Str
 jsIsVideoVisible = \video ->
-    "$(jsVideoYoutubeId) === '$(video.youtubeId)'"
+    "videoYoutubeId === '$(video.youtubeId)'"
 
 jsData : Str
-jsData = "{ $(jsVideoYoutubeId): null, timeout: null }"
+jsData = "{ videoYoutubeId: null, timeoutsByYoutubeId: {} }"
 
 jsToggleVideo : MediaVideo.MediaVideo -> Str
 jsToggleVideo = \video ->
-    "$(jsVideoYoutubeId) = $(jsIsVideoVisible video) ? null : '$(video.youtubeId)'"
+    "videoYoutubeId = $(jsIsVideoVisible video) ? null : '$(video.youtubeId)'"
 
 viewVideoPlayers : Media.Media -> Html.Node
 viewVideoPlayers = \media ->

@@ -44,15 +44,28 @@ class ImageElement extends HTMLElement {
     shadow.appendChild(style);
     shadow.appendChild(this.skeleton);
     shadow.appendChild(this.image);
+
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          this.loadImage();
+          this.observer.disconnect();
+        }
+      });
+    });
   }
 
   connectedCallback() {
-    this.image.src = this.getAttribute("src") ?? "";
-    this.image.addEventListener("load", () => this.onImageLoaded());
+    this.observer.observe(this);
   }
 
   disconnectedCallback() {
-    this.image.removeEventListener("load", () => this.onImageLoaded());
+    this.observer.disconnect();
+  }
+
+  loadImage() {
+    this.image.src = this.getAttribute("src") ?? "";
+    this.image.addEventListener("load", () => this.onImageLoaded());
   }
 
   onImageLoaded() {
