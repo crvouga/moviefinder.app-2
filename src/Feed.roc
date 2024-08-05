@@ -35,7 +35,7 @@ routeHx = \ctx, route ->
 
         FeedItems mediaQuery ->
             queried =
-                ctx.mediaDb.query! {
+                ctx.mediaDb.find! {
                     limit: mediaQuery.limit,
                     offset: mediaQuery.offset,
                     orderBy: Desc MediaId,

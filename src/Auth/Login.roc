@@ -7,7 +7,6 @@ import Html.Attr as Attr
 import App.TopBar
 import Ui.TextField
 import Ui.Button
-import Auth.VerifySms
 import Ui.Typography
 import Ctx
 import Auth.Login.Route
@@ -28,7 +27,7 @@ routeHx = \ctx, route ->
             viewVerifyCode { phoneNumber } |> Response.html |> Task.ok
 
         ClickedVerifyCode { phoneNumber } ->
-            verifiedCode <- Auth.VerifySms.verifyCode ctx.verifySms { phoneNumber, code: "123" } |> Task.attempt
+            verifiedCode <- ctx.verifySms.verifyCode { phoneNumber, code: "123" } |> Task.attempt
 
             when verifiedCode is
                 Ok _ ->
@@ -53,7 +52,7 @@ handleClickedSendCode = \ctx ->
             Task.ok (Response.redirect (Login SendCode))
 
         Ok phoneNumber ->
-            sent <- Auth.VerifySms.sendCode ctx.verifySms { phoneNumber } |> Task.attempt
+            sent <- ctx.verifySms.sendCode { phoneNumber } |> Task.attempt
 
             when sent is
                 Ok _ ->

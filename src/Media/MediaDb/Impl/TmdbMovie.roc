@@ -2,7 +2,7 @@ module [init, Config, getDiscoverMovie]
 
 import pf.Task exposing [Task]
 import pf.Http
-import Media.MediaDb exposing [MediaDb, MediaDbQuery, MediaDbFindById, MediaQuery]
+import Media.MediaDb exposing [MediaDb, Find, FindById, MediaQuery]
 import Media exposing [Media]
 import Logger
 import Media.MediaDb.Impl.Tmdb as Tmdb
@@ -94,8 +94,8 @@ tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
     mediaVideos: [],
 }
 
-query : Config -> MediaDbQuery
-query = \config -> \queryInput ->
+find : Config -> Find
+find = \config -> \queryInput ->
         rows = getDiscoverMovie! config queryInput
         Task.ok {
             limit: queryInput.limit,
@@ -219,7 +219,7 @@ getMovieDetails = \config, mediaId ->
 
     task |> Task.onErr (\_ -> Task.err NotFound)
 
-findById : Config -> MediaDbFindById
+findById : Config -> FindById
 findById = \config -> \mediaId, mediaType ->
         when mediaType is
             Movie -> getMovieDetails config mediaId
@@ -227,6 +227,6 @@ findById = \config -> \mediaId, mediaType ->
 
 init : Config -> MediaDb
 init = \config -> {
-    query: query config,
+    find: find config,
     findById: findById config,
 }

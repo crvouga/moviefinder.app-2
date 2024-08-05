@@ -1,4 +1,4 @@
-module [MediaDb, MediaDbQuery, MediaQuery, MediaField, MediaDbFindById]
+module [MediaDb, MediaQuery, MediaField, FindById, Find]
 
 import pf.Task exposing [Task]
 import Query exposing [Query]
@@ -11,11 +11,11 @@ MediaField : [MediaId, MediaType]
 
 MediaQuery : Query MediaField
 
-MediaDbQuery : Query MediaField -> Task (Paginated Media) []
+Find : Query MediaField -> Task (Paginated Media) []
 
-MediaDbFindById : MediaId, MediaType -> Task Media [NotFound]
+FindById : MediaId, MediaType -> Task Media [NotFound]
 
 MediaDb : {
-    query : MediaDbQuery,
-    findById : MediaDbFindById,
+    find : Find,
+    findById : FindById,
 }
