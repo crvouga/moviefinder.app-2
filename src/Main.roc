@@ -15,6 +15,7 @@ import Route
 import Account
 import Feed
 import App.Document
+import Logger
 import Media.Details
 
 main : Http.Request -> Task.Task Http.Response []
@@ -24,7 +25,7 @@ main = \httpReq ->
     req = Request.fromHttp httpReq
 
     ctx = Ctx.init { tmdbApiReadAccessToken } req
-    ctx.logger.info! (Inspect.toStr req)
+    Logger.info! ctx.logger (Inspect.toStr req)
 
     res =
         if

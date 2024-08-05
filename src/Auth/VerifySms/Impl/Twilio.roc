@@ -14,13 +14,13 @@ Config : {
 
 sendCode : Config -> VerifySms.SendCode
 sendCode = \config -> \{ phoneNumber } ->
-        config.logger.info! "VerifySmsFake. Sending code $(config.code) to phone number $(PhoneNumber.toStr phoneNumber)"
+        Logger.info! config.logger "VerifySmsFake. Sending code $(config.code) to phone number $(PhoneNumber.toStr phoneNumber)"
         _ <- Sleep.millis 1000 |> Task.await
         Task.ok {}
 
 verifyCode : Config -> VerifySms.VerifyCode
 verifyCode = \config -> \{ phoneNumber, code } ->
-        config.logger.info! "VerifySmsFake. Verifying code $(code) for phone number $(PhoneNumber.toStr phoneNumber)"
+        Logger.info! config.logger "VerifySmsFake. Verifying code $(code) for phone number $(PhoneNumber.toStr phoneNumber)"
         _ <- Sleep.millis 1000 |> Task.await
         if code != config.code then
             Task.ok {}

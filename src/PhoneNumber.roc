@@ -41,8 +41,8 @@ toUrlSafeStr : PhoneNumber -> Str
 toUrlSafeStr = \phoneNumber ->
     phoneNumber
     |> toStr
+    |> keepValidChars
     |> Str.replaceEach "+" "plus"
-    |> Str.replaceEach " " "-"
 
 fromUrlSafeStr : Str -> Result PhoneNumber [InvalidPhoneNumber]
 fromUrlSafeStr = \str ->
