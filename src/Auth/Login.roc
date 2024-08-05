@@ -5,9 +5,9 @@ import Response
 import Html
 import Html.Attr as Attr
 import App.TopBar
-import Ui.TextField as TextField
-import Ui.Button as Button
-import Ui.Typography as Typography
+import Ui.TextField
+import Ui.Button
+import Ui.Typography
 import Ctx
 import Auth.Login.Route
 import Route
@@ -50,11 +50,11 @@ viewSendCode = Html.div
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
             ]
             [
-                TextField.view {
+                Ui.TextField.view {
                     label: "Phone number",
                     inputType: Tel,
                 },
-                Button.view {
+                Ui.Button.a {
                     label: "Send code",
                     href: Auth.Login.Route.encode ClickedSendCode,
                     target: "#app",
@@ -74,9 +74,9 @@ viewVerifyCode = Html.div
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
             ]
             [
-                Typography.view { text: "Enter the code sent to your phone" },
-                TextField.view { label: "Code", inputType: Tel },
-                Button.view {
+                Ui.Typography.view { text: "Enter the code sent to your phone" },
+                Ui.TextField.view { label: "Code", inputType: Tel },
+                Ui.Button.a {
                     label: "Verify code",
                     href: Auth.Login.Route.encode ClickedVerifyCode,
                     target: "#app",
@@ -96,8 +96,8 @@ viewVerifiedCode = Html.div
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
             ]
             [
-                Typography.view { text: "Logged in" },
-                Button.view {
+                Ui.Typography.view { text: "Logged in" },
+                Ui.Button.a {
                     label: "Go home",
                     href: (Feed Feed) |> Route.encode,
                     target: "#app",

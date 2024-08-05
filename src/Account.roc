@@ -10,7 +10,7 @@ import Response
 import pf.Task
 import Ctx
 import Account.Route
-import Ui.Typography as Typography
+import Ui.Typography
 import Route
 import App.BottomNavigation as BottomNavigation
 
@@ -29,12 +29,12 @@ view =
             ]
             [
                 Icon.doorOpen { class: "size-20" },
-                Typography.view {
+                Ui.Typography.view {
                     text: "Login to access your account",
                     class: "font-bold text-xl",
                     variant: H2,
                 },
-                Ui.Button.view {
+                Ui.Button.a {
                     label: "Login",
                     href: Route.encode (Login SendCode),
                     target: "#app",

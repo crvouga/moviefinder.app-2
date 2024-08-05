@@ -17,6 +17,7 @@ import Ui.Typography
 import ImageSet
 import Ui.Spinner
 import X
+import Ui.Button
 import App.TopBar
 import Ui.Icon
 import MediaVideo
@@ -177,13 +178,27 @@ viewVideoPlayer : MediaVideo.MediaVideo -> Html.Node
 viewVideoPlayer = \mediaVideo ->
     Html.div
         [
-            Attr.class "absolute top-0 left-0 w-full z-10 bg-black border-b",
+            Attr.class "absolute top-0 left-0 w-full z-10 pointer-events-none",
             X.show (jsIsVideoVisible mediaVideo),
         ]
         [
-            Html.div [Attr.class "aspect-video w-full"] [
+            Html.div [Attr.class "aspect-video w-full bg-black border-b pointer-events-auto"] [
                 viewLoadVideoPlayer mediaVideo,
             ],
+            Html.div
+                [
+                    Attr.class "w-full p-3 flex items-center justify-end",
+                ]
+                [
+                    Ui.Button.button
+                        [
+                            X.on Click (jsToggleVideo mediaVideo),
+                        ]
+                        {
+                            label: "Close",
+                            class: "pointer-events-auto",
+                        },
+                ],
         ]
 
 viewLoadVideoPlayer : MediaVideo.MediaVideo -> Html.Node
