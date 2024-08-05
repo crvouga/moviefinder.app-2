@@ -24,7 +24,7 @@ text : Str -> Response
 text = Text
 
 redirect : Route.Route -> Response
-redirect = \route -> Redirect route
+redirect = Redirect
 
 httpHeader : Str, Str -> Http.Header
 httpHeader = \name, value -> {
