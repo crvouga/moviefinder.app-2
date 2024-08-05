@@ -43,11 +43,32 @@ routeHx = \ctx, route ->
                 }
             queried.rows |> viewFeedItems mediaQuery |> Response.html |> Task.ok
 
+viewChip : Str -> Html.Node
+viewChip = \text ->
+    Html.div
+        [
+            Attr.class "flex items-center justify-center px-2 py-1 bg-gray-200 rounded-full",
+        ]
+        [
+            Html.span
+                [
+                    Attr.class "text-base font-bold text-gray-800",
+                ]
+                [Html.text text],
+        ]
+
 viewFeed : Html.Node
 viewFeed =
     Html.div [Attr.class "w-full h-full flex flex-col"] [
+        Html.div
+            [
+                Attr.class "w-full h-16 flex items-center justify-start px-4 border-b",
+            ]
+            [
+                viewChip "Popular",
+            ],
         Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
-            Ui.Swiper.container { classList: ["h-full"], virtual: { enabled: Bool.true } } [
+            Ui.Swiper.container { classList: ["h-full"] } [
                 Html.div
                     [
                         Attr.class "flex items-center justify-center w-full h-full",

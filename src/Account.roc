@@ -25,7 +25,7 @@ view =
     Html.div [Attr.class "w-full h-full flex flex-col"] [
         Html.div
             [
-                Attr.class "w-full flex-1 flex items-center justify-center flex-col gap-2",
+                Attr.class "w-full flex-1 flex items-center justify-center flex-col gap-4",
             ]
             [
                 Icon.doorOpen { class: "size-20" },
