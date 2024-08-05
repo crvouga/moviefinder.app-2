@@ -9,10 +9,8 @@ import Media.MediaDb.Impl.Tmdb as Tmdb
 import Json
 import ImageSet
 import MediaId
-# import MediaType
 import MediaVideo
 import Url
-import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -207,7 +205,6 @@ getMovieDetails = \config, mediaId ->
         response = Http.send! (Tmdb.toRequest config url)
 
         decoded = Json.decode (Str.toUtf8 response)
-        Stdout.line! (if Bool.false then Inspect.toStr decoded else "")
 
         when decoded is
             Ok movieDetails ->
