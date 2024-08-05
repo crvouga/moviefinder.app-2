@@ -1,4 +1,4 @@
-module [swap, trigger, get, boost, target, isReq]
+module [swap, trigger, get, boost, target, isReq, post, pushUrl]
 
 import Html.Attr as Attr
 import pf.Http
@@ -39,6 +39,9 @@ trigger = \triggerValue -> triggerValue |> triggerValueToStr |> (Attr.attribute 
 get : Url -> Attr.Attribute
 get = \url -> (Attr.attribute "hx-get") (Url.toStr url)
 
+post : Url -> Attr.Attribute
+post = \url -> (Attr.attribute "hx-post") (Url.toStr url)
+
 boolToHtmlBool : Bool.Bool -> Str
 boolToHtmlBool = \bool ->
     if bool then
@@ -54,3 +57,6 @@ target = Attr.attribute "hx-target"
 
 isReq : Http.Request -> Bool
 isReq = \req -> List.any req.headers (\header -> header.name == "hx-request")
+
+pushUrl : Attr.Attribute
+pushUrl = (Attr.attribute "hx-push-url") "true"

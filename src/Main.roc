@@ -21,9 +21,9 @@ main : Http.Request -> Task.Task Http.Response []
 main = \httpReq ->
     tmdbApiReadAccessToken <- Env.var "TMDB_API_READ_ACCESS_TOKEN" |> Task.onErr (\_ -> Task.ok "") |> Task.await
 
-    ctx = Ctx.init { tmdbApiReadAccessToken }
-
     req = Request.fromHttp httpReq
+
+    ctx = Ctx.init { tmdbApiReadAccessToken } req
     ctx.logger.info! (Inspect.toStr req)
 
     res =

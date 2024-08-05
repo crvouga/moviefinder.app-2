@@ -18,8 +18,8 @@ boolToStr = \bool ->
     else
         "false"
 
-view : { label : Str, inputType ? InputType, required ? Bool } -> Html.Node
-view = \{ label, inputType ? Text, required ? Bool.false } ->
+view : { label : Str, name : Str, inputType ? InputType, required ? Bool } -> Html.Node
+view = \{ label, name, inputType ? Text, required ? Bool.false } ->
     Html.div
         [
             Attr.class "w-full flex flex-col gap-2",
@@ -28,6 +28,7 @@ view = \{ label, inputType ? Text, required ? Bool.false } ->
             Html.label [Attr.class "font-bold"] [Html.text label],
             Html.input [
                 Attr.class "w-full border bg-neutral-800 p-4 text-xl rounded",
+                Attr.name name,
                 inputType |> inputTypeToHtmlValue |> Attr.type,
                 required |> boolToStr |> Attr.required,
             ],

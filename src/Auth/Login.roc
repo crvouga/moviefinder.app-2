@@ -11,6 +11,8 @@ import Ui.Typography
 import Ctx
 import Auth.Login.Route
 import Route
+import Hx
+import PhoneNumber
 
 routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -19,18 +21,29 @@ routeHx = \ctx, route ->
             viewSendCode |> Response.html |> Task.ok
 
         ClickedSendCode ->
-            ctx.verifySms.sendCode! { phone: "123" }
-            Login VerifyCode |> Response.redirect |> Task.ok
+            parsedPhoneNumber =
+                ctx.req.formData
+                |> Dict.get "phoneNumber"
+                |> Result.withDefault ""
+                |> PhoneNumber.fromStr
 
-        VerifyCode ->
-            viewVerifyCode |> Response.html |> Task.ok
+            when parsedPhoneNumber is
+                Err InvalidPhoneNumber ->
+                    Task.ok (Response.redirect (Login SendCode))
 
-        ClickedVerifyCode ->
+                Ok phoneNumber ->
+                    ctx.verifySms.sendCode! { phoneNumber }
+                    Login (VerifyCode { phoneNumber }) |> Response.redirect |> Task.ok
+
+        VerifyCode { phoneNumber } ->
+            viewVerifyCode { phoneNumber } |> Response.html |> Task.ok
+
+        ClickedVerifyCode { phoneNumber } ->
             responseOk =
                 Login VerifiedCode |> Response.redirect |> Task.ok
 
             task =
-                ctx.verifySms.verifyCode! { phone: "123", code: "123" }
+                ctx.verifySms.verifyCode! { phoneNumber, code: "123" }
                 responseOk
 
             task |> Task.onErr \_ -> responseOk
@@ -45,44 +58,58 @@ viewSendCode = Html.div
     ]
     [
         App.TopBar.view { title: "Login with phone", back: Account Account },
-        Html.div
+        Html.form
             [
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
+                Hx.swap InnerHtml,
+                Hx.target "#app",
+                Hx.trigger Submit,
+                Hx.pushUrl,
+                Hx.post (Auth.Login.Route.encode ClickedSendCode),
             ]
             [
                 Ui.TextField.view {
                     label: "Phone number",
                     inputType: Tel,
+                    name: "phoneNumber",
                 },
-                Ui.Button.a {
+                Ui.Button.button [] {
                     label: "Send code",
-                    href: Auth.Login.Route.encode ClickedSendCode,
-                    target: "#app",
                 },
             ],
     ]
 
-viewVerifyCode : Html.Node
-viewVerifyCode = Html.div
-    [
-        Attr.class "w-full h-full flex flex-col",
-    ]
-    [
-        App.TopBar.view { title: "Login with phone", back: Login SendCode },
-        Html.div
-            [
-                Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
-            ]
-            [
-                Ui.Typography.view { text: "Enter the code sent to your phone" },
-                Ui.TextField.view { label: "Code", inputType: Tel },
-                Ui.Button.a {
-                    label: "Verify code",
-                    href: Auth.Login.Route.encode ClickedVerifyCode,
-                    target: "#app",
-                },
-            ],
-    ]
+viewVerifyCode : { phoneNumber : PhoneNumber.PhoneNumber } -> Html.Node
+viewVerifyCode = \{ phoneNumber } -> Html.div
+        [
+            Attr.class "w-full h-full flex flex-col",
+        ]
+        [
+            App.TopBar.view { title: "Login with phone", back: Login SendCode },
+            Html.form
+                [
+                    Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
+                    Hx.swap InnerHtml,
+                    Hx.target "#app",
+                    Hx.trigger Submit,
+                    Hx.pushUrl,
+                    Hx.post (Auth.Login.Route.encode (ClickedVerifyCode { phoneNumber })),
+                ]
+                [
+                    Ui.Typography.view {
+                        text: "Enter the code sent to $(PhoneNumber.format phoneNumber)",
+                        class: "text-lg font-bold pt-4",
+                    },
+                    Ui.TextField.view {
+                        label: "Code",
+                        name: "code",
+                        inputType: Tel,
+                    },
+                    Ui.Button.button [] {
+                        label: "Verify code",
+                    },
+                ],
+        ]
 
 viewVerifiedCode : Html.Node
 viewVerifiedCode = Html.div
