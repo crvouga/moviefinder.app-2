@@ -4,7 +4,7 @@ import pf.Task
 import Response
 import Html
 import Html.Attr as Attr
-import Ui.TopBar as TopBar
+import App.TopBar
 import Ui.TextField as TextField
 import Ui.Button as Button
 import Ui.Typography as Typography
@@ -44,7 +44,7 @@ viewSendCode = Html.div
         Attr.class "w-full h-full flex flex-col",
     ]
     [
-        TopBar.view { title: "Login with phone" },
+        App.TopBar.view { title: "Login with phone", back: Account Account },
         Html.div
             [
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
@@ -68,7 +68,7 @@ viewVerifyCode = Html.div
         Attr.class "w-full h-full flex flex-col",
     ]
     [
-        TopBar.view { title: "Login with phone" },
+        App.TopBar.view { title: "Login with phone", back: Login SendCode },
         Html.div
             [
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
@@ -90,7 +90,7 @@ viewVerifiedCode = Html.div
         Attr.class "w-full h-full flex flex-col",
     ]
     [
-        TopBar.view { title: "Login with phone" },
+        App.TopBar.view { title: "Login with phone", back: Feed Feed },
         Html.div
             [
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",

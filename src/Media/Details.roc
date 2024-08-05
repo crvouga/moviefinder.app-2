@@ -17,6 +17,7 @@ import Ui.Typography
 import ImageSet
 import Ui.Spinner
 import X
+import App.TopBar
 import Ui.Icon
 import MediaVideo
 
@@ -52,6 +53,10 @@ viewDetailsLoading = \mediaQuery -> Html.div
             Hx.get (Media.Details.Route.encode (DetailsLoad mediaQuery)),
         ]
         [
+            App.TopBar.view {
+                back: Feed Feed,
+                title: "",
+            },
             Ui.Image.view [
                 Attr.src " ",
                 Attr.alt " ",
@@ -67,40 +72,51 @@ viewDetailsLoading = \mediaQuery -> Html.div
         ]
 
 viewDetails : Media.Media -> Html.Node
-viewDetails = \media -> Html.div
+viewDetails = \media ->
+    Html.div
         [
-            Attr.class "w-full h-full flex flex-col overflow-hidden relative",
-            X.data jsData,
+            Attr.class "w-full h-full flex flex-col overflow-hidden",
         ]
         [
-            viewVideoPlayers media,
+            App.TopBar.view {
+                back: Feed Feed,
+                title: media.mediaTitle,
+            },
             Html.div
                 [
-                    Attr.class "w-full h-full flex flex-col overflow-y-scroll",
+                    Attr.class "w-full h-full flex flex-col overflow-hidden relative",
+                    X.data jsData,
                 ]
                 [
-                    Ui.Image.view [
-                        Attr.src (ImageSet.highestRes media.mediaBackdrop),
-                        Attr.alt " ",
-                        Attr.class "w-full aspect-video shrink-0",
-                    ],
+                    viewVideoPlayers media,
                     Html.div
                         [
-                            Attr.class "w-full p-4 gap-4 flex flex-col",
+                            Attr.class "w-full h-full flex flex-col overflow-y-scroll",
                         ]
                         [
-                            Ui.Typography.view {
-                                variant: H1,
-                                text: media.mediaTitle,
-                                class: "text-center text-3xl font-bold",
-                            },
-                            Ui.Typography.view {
-                                variant: Body,
-                                text: media.mediaDescription,
-                                class: "text-center text-sm opacity-80",
-                            },
+                            Ui.Image.view [
+                                Attr.src (ImageSet.highestRes media.mediaBackdrop),
+                                Attr.alt " ",
+                                Attr.class "w-full aspect-video shrink-0",
+                            ],
+                            Html.div
+                                [
+                                    Attr.class "w-full p-4 gap-4 flex flex-col",
+                                ]
+                                [
+                                    Ui.Typography.view {
+                                        variant: H1,
+                                        text: media.mediaTitle,
+                                        class: "text-center text-3xl font-bold",
+                                    },
+                                    Ui.Typography.view {
+                                        variant: Body,
+                                        text: media.mediaDescription,
+                                        class: "text-center text-sm opacity-80",
+                                    },
+                                ],
+                            viewVideoList media,
                         ],
-                    viewVideoList media,
                 ],
         ]
 
@@ -108,38 +124,21 @@ jsRefVideoIframeId : MediaVideo.MediaVideo -> Str
 jsRefVideoIframeId = \video ->
     "iframe-$(video.youtubeId)"
 
-jsPauseIframe : Str
-jsPauseIframe =
-    "iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');"
-
-jsPlayIframe : Str
-jsPlayIframe =
-    """
-    iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
-    setTimeout(() => {
-        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
-    }, 250);
-    """
-
-jsShouldPauseIframe : MediaVideo.MediaVideo -> Str
-jsShouldPauseIframe = \video ->
-    "iframe && $(jsVideoYoutubeId) !== '$(video.youtubeId)'"
-
-jsConstIframe : MediaVideo.MediaVideo -> Str
-jsConstIframe = \video ->
-    "const iframe = $refs['$(jsRefVideoIframeId video)'];"
-
-jsIf : Str, Str, Str -> Str
-jsIf = \conditionStr, thenStr, elseStr ->
-    "if ($(conditionStr)) {\n\t$(thenStr)\n} else {\n\t$(elseStr)\n};\n"
-
 xEffectIframePauseEffect : MediaVideo.MediaVideo -> Str
 xEffectIframePauseEffect = \video ->
-    [
-        jsConstIframe video,
-        jsIf (jsShouldPauseIframe video) jsPauseIframe jsPlayIframe,
-    ]
-    |> Str.joinWith "\n"
+    """
+    const iframe = $refs['$(jsRefVideoIframeId video)'];    
+    if(iframe && $(jsVideoYoutubeId) !== '$(video.youtubeId)') {
+        clearTimeout(timeout)
+        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
+    } else {
+        iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
+        clearTimeout(timeout)
+        timeout = setTimeout(() => {
+            iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
+        }, 1000);
+    }
+    """
 
 viewEmbeddedVideo : MediaVideo.MediaVideo -> Html.Node
 viewEmbeddedVideo = \mediaVideo -> Html.div
@@ -168,7 +167,7 @@ jsIsVideoVisible = \video ->
     "$(jsVideoYoutubeId) === '$(video.youtubeId)'"
 
 jsData : Str
-jsData = "{ $(jsVideoYoutubeId): null }"
+jsData = "{ $(jsVideoYoutubeId): null, timeout: null }"
 
 jsToggleVideo : MediaVideo.MediaVideo -> Str
 jsToggleVideo = \video ->

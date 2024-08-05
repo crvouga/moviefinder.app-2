@@ -8,29 +8,25 @@ styles =
     html {
         font-family: \"Inter\", sans-serif;
     }
-        
+
+    /* Hide scrollbar for WebKit browsers */
     ::-webkit-scrollbar {
         width: 0px;
         height: 0px;
     }
 
     ::-webkit-scrollbar-track {
-        background: #000;
+        background: transparent;
     }
 
     ::-webkit-scrollbar-thumb {
-        background-color: #fff;
-        border-radius: 0px;
-        border: none;
+        background-color: transparent;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-        background-color: #fff;
-    }
-
+    /* Hide scrollbar for other browsers */
     * {
-        scrollbar-width: thin;
-        scrollbar-color: #fff #000;
+        scrollbar-width: none;
+        scrollbar-color: transparent transparent;
     }
     """
 

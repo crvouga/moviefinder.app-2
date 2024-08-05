@@ -29,7 +29,8 @@ class ImageElement extends HTMLElement {
       .image {
         display: none;
         width: 100%;
-        height: auto;
+        height: 100%;
+        object-fit: cover;
       }
     `;
 

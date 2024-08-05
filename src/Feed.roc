@@ -47,7 +47,7 @@ viewFeed : Html.Node
 viewFeed =
     Html.div [Attr.class "w-full h-full flex flex-col"] [
         Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
-            Ui.Swiper.container { classList: ["h-full"] } [
+            Ui.Swiper.container { classList: ["h-full"], virtual: { enabled: Bool.true } } [
                 Html.div
                     [
                         Attr.class "flex items-center justify-center w-full h-full",

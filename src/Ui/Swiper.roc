@@ -15,7 +15,19 @@ Config : {
     slidesPerView ? I32,
     direction ? Direction,
     classList ? List Str,
+    # https://swiperjs.com/swiper-api#virtual-slides
+    virtual ? {
+        enabled : Bool,
+    },
 }
+
+# virtualToStr : { enabled : Bool } -> Str
+# virtualToStr = \{ enabled } ->
+#     if enabled then
+#         "{enabled: true}"
+#     else
+#         "{enabled: false}"
+virtualAttr = Attr.attribute "virtual"
 
 swiperContainer = Html.element "swiper-container"
 slidesPerViewAttr = Attr.attribute "slides-per-view"
@@ -27,6 +39,7 @@ container = \{ slidesPerView ? 1, direction ? Vertical, classList ? [] }, childr
         [
             slidesPerView |> Num.toStr |> slidesPerViewAttr,
             direction |> directionToStr |> directionAttr,
+            virtualAttr "false",
             Attr.classList classList,
         ]
         children
