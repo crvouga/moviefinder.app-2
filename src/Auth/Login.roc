@@ -21,49 +21,41 @@ routeHx = \ctx, route ->
             viewSendCode |> Response.html |> Task.ok
 
         ClickedSendCode ->
-            clickedSendCode ctx
+            parsedPhoneNumber =
+                ctx.req.formData
+                |> Dict.get "phoneNumber"
+                |> Result.withDefault ""
+                |> PhoneNumber.fromStr
+
+            when parsedPhoneNumber is
+                Err InvalidPhoneNumber ->
+                    Task.ok (Response.redirect (Login SendCode))
+
+                Ok phoneNumber ->
+                    sent <- (ctx.verifySms.sendCode { phoneNumber }) |> Task.attempt
+
+                    when sent is
+                        Ok _ ->
+                            Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
+
+                        Err _ ->
+                            Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
 
         VerifyCode { phoneNumber } ->
             viewVerifyCode { phoneNumber } |> Response.html |> Task.ok
 
         ClickedVerifyCode { phoneNumber } ->
-            clickedVerifyCode ctx phoneNumber
+            verifiedCode <- (ctx.verifySms.verifyCode { phoneNumber, code: "123" }) |> Task.attempt
+
+            when verifiedCode is
+                Ok _ ->
+                    Login VerifiedCode |> Response.redirect |> Task.ok
+
+                Err _ ->
+                    (Login (VerifyCode { phoneNumber, error: "Something went wrong" })) |> Response.redirect |> Task.ok
 
         VerifiedCode ->
             viewVerifiedCode |> Response.html |> Task.ok
-
-clickedVerifyCode : Ctx.Ctx, PhoneNumber.PhoneNumber -> Task.Task Response.Response []
-clickedVerifyCode = \ctx, phoneNumber ->
-    verifiedCode <- ctx.verifySms.verifyCode { phoneNumber, code: "123" } |> Task.attempt
-
-    when verifiedCode is
-        Ok _ ->
-            Login VerifiedCode |> Response.redirect |> Task.ok
-
-        Err _ ->
-            (Login (VerifyCode { phoneNumber, error: "Something went wrong" })) |> Response.redirect |> Task.ok
-
-clickedSendCode : Ctx.Ctx -> Task.Task Response.Response *
-clickedSendCode = \ctx ->
-    parsedPhoneNumber =
-        ctx.req.formData
-        |> Dict.get "phoneNumber"
-        |> Result.withDefault ""
-        |> PhoneNumber.fromStr
-
-    when parsedPhoneNumber is
-        Err InvalidPhoneNumber ->
-            Task.ok (Response.redirect (Login SendCode))
-
-        Ok phoneNumber ->
-            sent <- ctx.verifySms.sendCode { phoneNumber } |> Task.attempt
-
-            when sent is
-                Ok _ ->
-                    Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
-
-                Err _ ->
-                    Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
 
 viewSendCode : Html.Node
 viewSendCode = Html.div

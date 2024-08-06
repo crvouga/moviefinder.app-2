@@ -29,7 +29,6 @@ routeHx = \ctx, route ->
             viewDetailsLoading mediaQuery |> Response.html |> Task.ok
 
         DetailsLoad mediaQuery ->
-            # Sleep.millis! 10000
             queried <- (ctx.mediaDb.findById mediaQuery.mediaId mediaQuery.mediaType) |> Task.attempt
 
             when queried is
