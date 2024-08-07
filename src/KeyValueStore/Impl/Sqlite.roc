@@ -13,6 +13,13 @@ Config : {
     logger : Logger,
 }
 
+removeSqlitePrefix : Str -> Str
+removeSqlitePrefix = \str ->
+    Str.replaceFirst str "sqlite:" " " |> Str.trim
+
+expect
+    removeSqlitePrefix "sqlite:db/database.sqlite3" == "db/database.sqlite3"
+
 get : Config, Str -> Task.Task Str [NotFound, Errored Str]
 get = \config, key ->
     # Logger.info! config.logger "Getting key: $(key)"
@@ -20,7 +27,7 @@ get = \config, key ->
 
     executed <-
         SQLite3.execute {
-            path: config.databaseUrl,
+            path: removeSqlitePrefix config.databaseUrl,
             query: "SELECT key, value FROM key_value WHERE key = :key;",
             bindings: [{ name: ":key", value: key }],
         }
