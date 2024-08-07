@@ -6,52 +6,56 @@ import pf.Task
 import pf.SQLite3
 import KeyValueStore
 import Logger exposing [Logger]
+import pf.Stdout
 
 Config : {
-    sqlitePath : Str,
+    databaseUrl : Str,
     logger : Logger,
 }
 
-get : Config -> (Str -> Task.Task Str [NotFound, Errored Str])
-get = \config -> \key ->
-        executed <-
-            SQLite3.execute {
-                path: config.sqlitePath,
-                query: "SELECT key, value FROM key_value WHERE key = :key;",
-                bindings: [{ name: ":jey", value: key }],
-            }
-            |> Task.attempt
+get : Config, Str -> Task.Task Str [NotFound, Errored Str]
+get = \config, key ->
+    # Logger.info! config.logger "Getting key: $(key)"
+    Stdout.line! "Getting key: $(key) $(config.databaseUrl)"
 
-        when executed is
-            Err err -> Task.err (Errored (SQLite3.errToStr err))
-            Ok rows ->
-                firstRow = List.first rows
-                when firstRow is
-                    Err _ -> Task.err NotFound
-                    Ok row ->
-                        firstColumn = List.first row
-                        when firstColumn is
-                            Err _ -> Task.err (Errored "No value")
-                            Ok columnValue ->
-                                when columnValue is
-                                    String columnValueStr -> Task.ok columnValueStr
-                                    _ -> Task.err (Errored "No value")
+    executed <-
+        SQLite3.execute {
+            path: config.databaseUrl,
+            query: "SELECT key, value FROM key_value WHERE key = :key;",
+            bindings: [{ name: ":key", value: key }],
+        }
+        |> Task.attempt
 
-set : Config -> (Str, Str -> Task.Task {} [Errored Str])
-set = \config -> \key, value ->
-        executed <- SQLite3.execute {
-                path: config.sqlitePath,
-                query: "INSERT INTO key_value(key, value) VALUES (:key, :value)",
-                bindings: [{ name: ":key", value: key }, { name: ":value", value: value }],
-            }
-            |> Task.attempt
+    when executed is
+        Err err -> Task.err (Errored (SQLite3.errToStr err))
+        Ok rows ->
+            firstRow = List.first rows
+            when firstRow is
+                Err _ -> Task.err NotFound
+                Ok row ->
+                    firstColumn = List.first row
+                    when firstColumn is
+                        Err _ -> Task.err (Errored "No value")
+                        Ok columnValue ->
+                            when columnValue is
+                                String columnValueStr -> Task.ok columnValueStr
+                                _ -> Task.err (Errored "No value")
 
-        when executed is
-            Ok _ -> Task.ok {}
-            Err err -> Task.err (Errored (SQLite3.errToStr err))
+set : Config, Str, Str -> Task.Task {} [Errored Str]
+set = \config, key, value ->
+    executed <- SQLite3.execute {
+            path: config.databaseUrl,
+            query: "INSERT INTO key_value(key, value) VALUES (:key, :value)",
+            bindings: [{ name: ":key", value: key }, { name: ":value", value: value }],
+        }
+        |> Task.attempt
+
+    when executed is
+        Ok _ -> Task.ok {}
+        Err err -> Task.err (Errored (SQLite3.errToStr err))
 
 init : Config -> KeyValueStore.KeyValueStore
 init = \config -> {
-    get: get config,
-    set: set config,
+    get: \key -> get config key,
+    set: \key, value -> set config key value,
 }

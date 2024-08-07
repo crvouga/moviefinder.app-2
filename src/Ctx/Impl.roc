@@ -11,12 +11,12 @@ logger = Logger.init ["app"]
 
 Config : {
     tmdbApiReadAccessToken : Str,
-    sqlitePath : Str,
+    databaseUrl : Str,
 }
 
 init : Config, Request.Request -> Ctx.Ctx
 init = \config, req -> {
-    keyValueStore: KeyValueStore.Impl.init (Sqlite { sqlitePath: config.sqlitePath, logger: Logger.init ["key-value-store", "sqlite"] }),
+    keyValueStore: KeyValueStore.Impl.init (Sqlite { databaseUrl: config.databaseUrl, logger: Logger.init ["key-value-store", "sqlite"] }),
     verifySms: Auth.VerifySms.Impl.init
         (
             Fake {

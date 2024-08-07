@@ -22,11 +22,11 @@ import Media.Details
 main : Http.Request -> Task.Task Http.Response []
 main = \httpReq ->
     tmdbApiReadAccessToken <- Env.var "TMDB_API_READ_ACCESS_TOKEN" |> Task.onErr (\_ -> Task.ok "") |> Task.await
-    sqlitePath <- Env.var "SQLITE_PATH" |> Task.onErr (\_ -> Task.ok "") |> Task.await
+    databaseUrl <- Env.var "DATABASE_URL" |> Task.onErr (\_ -> Task.ok "") |> Task.await
 
     req = Request.fromHttp httpReq
 
-    ctx = Ctx.Impl.init { tmdbApiReadAccessToken, sqlitePath } req
+    ctx = Ctx.Impl.init { tmdbApiReadAccessToken, databaseUrl } req
     Logger.info! ctx.logger (Inspect.toStr req)
 
     res =

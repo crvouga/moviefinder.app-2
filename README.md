@@ -7,6 +7,12 @@ chmod +x ./run
 ./run
 ```
 
+## Database Migrations
+
+```sh
+npx dbmate --help
+```
+
 ## Build Docker
 
 ```sh

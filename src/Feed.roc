@@ -17,6 +17,7 @@ import ImageSet
 import Ui.Swiper
 import Ui.Image
 import App.Link
+import Logger
 
 defaultMediaQuery : {
     limit : U64,
@@ -41,6 +42,10 @@ routeHx = \ctx, route ->
                     orderBy: Desc MediaId,
                     where: And [],
                 }
+
+            got <- ctx.keyValueStore.get "feed" |> Task.attempt
+            Logger.info! ctx.logger (Inspect.toStr got)
+
             queried.rows |> viewFeedItems mediaQuery |> Response.html |> Task.ok
 
 viewChip : Str -> Html.Node
