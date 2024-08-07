@@ -29,7 +29,7 @@ routeHx = \ctx, route ->
             viewDetailsLoading mediaQuery |> Response.html |> Task.ok
 
         DetailsLoad mediaQuery ->
-            queried <- (ctx.mediaDb.findById mediaQuery.mediaId mediaQuery.mediaType) |> Task.attempt
+            queried <- ctx.mediaDb.findById mediaQuery.mediaId mediaQuery.mediaType |> Task.attempt
 
             when queried is
                 Ok media ->
@@ -124,16 +124,12 @@ jsRefVideoIframeId : MediaVideo.MediaVideo -> Str
 jsRefVideoIframeId = \video ->
     "iframe-$(video.youtubeId)"
 
-xEffectPlayPauseVideo : MediaVideo.MediaVideo -> Str
-xEffectPlayPauseVideo = \video ->
+jsEffectPlayPauseVideo : MediaVideo.MediaVideo -> Str
+jsEffectPlayPauseVideo = \video ->
     """
     const iframe = $refs['$(jsRefVideoIframeId video)'];
-    clearInterval(timeoutsByYoutubeId['$(video.youtubeId)'])
     if(iframe && videoYoutubeId === '$(video.youtubeId)') {
         iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
-        timeoutsByYoutubeId['$(video.youtubeId)'] = setTimeout(() => {
-            iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: '' }), '*');
-        }, 1000);
     } else if(iframe) {
         iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
     }
@@ -149,7 +145,7 @@ viewEmbeddedVideo = \mediaVideo -> Html.div
                 [
                     Attr.src mediaVideo.youtubeEmbedUrl,
                     X.ref (jsRefVideoIframeId mediaVideo),
-                    X.effect (xEffectPlayPauseVideo mediaVideo),
+                    X.effect (jsEffectPlayPauseVideo mediaVideo),
                     Attr.class "w-full h-full",
                     (Attr.attribute "frameborder") "0",
                     Attr.allow "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
