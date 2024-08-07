@@ -1,6 +1,8 @@
 module [KeyValueStore]
 
-KeyValueStore a : {
-    get : Str -> Task.Task a [],
-    set : Str a -> Task.Task {} [],
+import pf.Task exposing [Task]
+
+KeyValueStore : {
+    get : Str -> Task.Task Str [NotFound, Errored Str],
+    set : Str, Str -> Task.Task {} [Errored Str],
 }

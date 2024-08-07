@@ -3,17 +3,20 @@ module [init]
 import Ctx
 import Auth.VerifySms.Impl
 import Media.MediaDb.Impl
+import KeyValueStore.Impl
 import Logger
 import Request
 
 logger = Logger.init ["app"]
 
-Config a : {
+Config : {
     tmdbApiReadAccessToken : Str,
-}a
+    sqlitePath : Str,
+}
 
-init : Config *, Request.Request -> Ctx.Ctx
+init : Config, Request.Request -> Ctx.Ctx
 init = \config, req -> {
+    keyValueStore: KeyValueStore.Impl.init (Sqlite { sqlitePath: config.sqlitePath, logger: Logger.init ["key-value-store", "sqlite"] }),
     verifySms: Auth.VerifySms.Impl.init
         (
             Fake {

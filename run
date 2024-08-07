@@ -5,4 +5,4 @@ clear
 export $(grep -v '^#' .env | xargs)
 
 # Run the roc commands with the environment variable
-roc check ./src/Main.roc && roc format && roc test ./src/Main.roc && TMDB_API_READ_ACCESS_TOKEN="$TMDB_API_READ_ACCESS_TOKEN" roc run ./src/Main.roc
+roc check ./src/Main.roc && roc format && roc test ./src/Main.roc && SQLITE_PATH="$SQLITE_PATH" TMDB_API_READ_ACCESS_TOKEN="$TMDB_API_READ_ACCESS_TOKEN" roc run ./src/Main.roc
