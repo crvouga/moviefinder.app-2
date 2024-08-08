@@ -7,6 +7,7 @@ import Ui.Spinner
 import Route
 import App.Styles
 import "../Ui/image-element.js" as imageElementJs : Str
+import "../Ui/swiper-feed-element.js" as swiperFeedElementJs : Str
 
 view : { route : Route.Route } -> Html.Node
 view = \{ route } ->
@@ -23,7 +24,9 @@ view = \{ route } ->
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
                 Html.script [Attr.src "https://unpkg.com/htmx.org@2.0.1", Attr.defer "true"] [],
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js", Attr.defer "true"] [],
-                Html.script [] [Html.dangerouslyIncludeUnescapedHtml imageElementJs],
+                # Html.script [Attr.src "https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs", Attr.defer "true"] [],
+                Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml imageElementJs],
+                Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml swiperFeedElementJs],
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", Attr.defer "true"] [],
                 Html.link [Attr.rel "preconnect", Attr.href "https://fonts.googleapis.com"],
                 Html.link [Attr.rel "preconnect", Attr.href "https://fonts.gstatic.com"],

@@ -18,6 +18,7 @@ import Ui.Swiper
 import Ui.Image
 import App.Link
 import Logger
+# import Ui.SwiperFeed`
 
 defaultMediaQuery : {
     limit : U64,
@@ -73,6 +74,7 @@ viewFeed =
                 viewChip "Popular",
             ],
         Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
+            # Ui.SwiperFeed.view {},
             Ui.Swiper.container { classList: ["h-full"] } [
                 Html.div
                     [
@@ -89,18 +91,6 @@ viewFeed =
         App.BottomNavigation.view Home,
     ]
 
-viewFeedItemLoadMore : { limit : U64, offset : U64 } -> Html.Node
-viewFeedItemLoadMore = \mediaQuery ->
-    Ui.Swiper.slide
-        [
-            Attr.class "w-full h-full flex items-center justify-center",
-            Hx.swap OuterHtml,
-            Hx.trigger Intersect,
-            Hx.get (Feed.Route.encode (FeedItems { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
-        ]
-        [
-            Ui.Spinner.view,
-        ]
 
 viewFeedItems : List Media.Media, { limit : U64, offset : U64 } -> Html.Node
 viewFeedItems = \mediaList, mediaQuery ->
@@ -134,4 +124,17 @@ viewFeedItem = \media ->
                         Attr.src (ImageSet.highestRes media.mediaPoster),
                     ],
                 ],
+        ]
+        
+viewFeedItemLoadMore : { limit : U64, offset : U64 } -> Html.Node
+viewFeedItemLoadMore = \mediaQuery ->
+    Ui.Swiper.slide
+        [
+            Attr.class "w-full h-full flex items-center justify-center",
+            Hx.swap OuterHtml,
+            Hx.trigger Intersect,
+            Hx.get (Feed.Route.encode (FeedItems { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
+        ]
+        [
+            Ui.Spinner.view,
         ]
