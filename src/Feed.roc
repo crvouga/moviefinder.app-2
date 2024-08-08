@@ -15,17 +15,19 @@ import Ui.Spinner
 import App.BottomNavigation
 import ImageSet
 import Ui.Swiper
+# import X
 import Ui.Image
 import App.Link
 import Logger
-# import Ui.SwiperFeed`
+# import pf.Sleep
+# import Ui.SwiperFeed
 
 defaultMediaQuery : {
     limit : U64,
     offset : U64,
 }
 defaultMediaQuery = {
-    limit: 20,
+    limit: 5,
     offset: 0,
 }
 
@@ -35,7 +37,7 @@ routeHx = \ctx, route ->
         Feed ->
             viewFeed |> Response.html |> Task.ok
 
-        FeedItems mediaQuery ->
+        LoadMoreItems mediaQuery ->
             queried =
                 ctx.mediaDb.find! {
                     limit: mediaQuery.limit,
@@ -45,9 +47,10 @@ routeHx = \ctx, route ->
                 }
 
             got <- ctx.keyValueStore.get "feed" |> Task.attempt
+
             Logger.info! ctx.logger (Inspect.toStr got)
 
-            queried.rows |> viewFeedItems mediaQuery |> Response.html |> Task.ok
+            queried.rows |> viewFeedItems mediaQuery |> Response.html |> Response.hxTrigger "feedLoadedMoreItems" |> Task.ok
 
 viewChip : Str -> Html.Node
 viewChip = \text ->
@@ -63,34 +66,63 @@ viewChip = \text ->
                 [Html.text text],
         ]
 
+jsRemoveFirstChildren : Str
+jsRemoveFirstChildren =
+    """
+    document.addEventListener('feedLoadedMoreItems', function () {
+        console.log('feedLoadedMoreItems');
+        const swiperElement = document.querySelector('swiper-container');
+        if(!swiperElement) {
+            return;
+        }
+        const swiper = swiperElement.swiper
+        const slideIndexes = []
+        for (let i = 0; i < 20; i++) {
+            slideIndexes.push(i);
+        }
+        console.log('slideIndexes', slideIndexes);
+        swiper.removeSlide(slideIndexes);
+    })
+    """
 viewFeed : Html.Node
 viewFeed =
-    Html.div [Attr.class "w-full h-full flex flex-col"] [
-        Html.div
-            [
-                Attr.class "w-full h-16 flex items-center justify-start px-4 border-b",
-            ]
-            [
-                viewChip "Popular",
-            ],
-        Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
-            # Ui.SwiperFeed.view {},
-            Ui.Swiper.container { classList: ["h-full"] } [
-                Html.div
+    Html.div
+        [
+            Attr.class "w-full h-full flex flex-col",
+            (Attr.attribute "hx-on") "htmx:afterSwap: console.log('swapped')",
+        ]
+        [
+            Html.div
+                [
+                    Attr.class "w-full h-16 flex items-center justify-start px-4 border-b",
+                ]
+                [
+                    viewChip "Popular",
+                ],
+            Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
+                Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml jsRemoveFirstChildren],
+                Ui.Swiper.container
                     [
-                        Attr.class "flex items-center justify-center w-full h-full",
-                        Hx.swap OuterHtml,
-                        Hx.trigger Load,
-                        Hx.get (Feed.Route.encode (FeedItems defaultMediaQuery)),
+                        Attr.class "w-full max-w-full h-full max-h-full",
+                        Ui.Swiper.slidesPerView 1,
+                        Ui.Swiper.direction Vertical,
                     ]
                     [
-                        Ui.Spinner.view,
+                        Html.div
+                            [
+                                Attr.class "flex items-center justify-center w-full h-full",
+                                Hx.swap OuterHtml,
+                                Hx.trigger Load,
+                                Hx.get (Feed.Route.encode (LoadMoreItems defaultMediaQuery)),
+
+                            ]
+                            [
+                                Ui.Spinner.view,
+                            ],
                     ],
             ],
-        ],
-        App.BottomNavigation.view Home,
-    ]
-
+            App.BottomNavigation.view Home,
+        ]
 
 viewFeedItems : List Media.Media, { limit : U64, offset : U64 } -> Html.Node
 viewFeedItems = \mediaList, mediaQuery ->
@@ -125,7 +157,7 @@ viewFeedItem = \media ->
                     ],
                 ],
         ]
-        
+
 viewFeedItemLoadMore : { limit : U64, offset : U64 } -> Html.Node
 viewFeedItemLoadMore = \mediaQuery ->
     Ui.Swiper.slide
@@ -133,7 +165,7 @@ viewFeedItemLoadMore = \mediaQuery ->
             Attr.class "w-full h-full flex items-center justify-center",
             Hx.swap OuterHtml,
             Hx.trigger Intersect,
-            Hx.get (Feed.Route.encode (FeedItems { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
+            Hx.get (Feed.Route.encode (LoadMoreItems { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
         ]
         [
             Ui.Spinner.view,

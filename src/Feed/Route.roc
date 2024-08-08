@@ -1,13 +1,13 @@
 module [Route, encode, decode]
 import Url exposing [Url]
 
-Route : [Feed, FeedItems { limit : U64, offset : U64 }]
+Route : [Feed, LoadMoreItems { limit : U64, offset : U64 }]
 
 encode : Route -> Url
 encode = \route ->
     when route is
         Feed -> "/feed" |> Url.fromStr
-        FeedItems mediaQuery ->
+        LoadMoreItems mediaQuery ->
             "/feed/feed-items"
             |> Url.fromStr
             |> Url.appendParam "limit" (Num.toStr mediaQuery.limit)
@@ -23,7 +23,7 @@ decode = \url ->
             offsetStr = queryParams |> Dict.get "offset" |> Result.withDefault ""
             limit = limitStr |> Str.toU64 |> Result.withDefault 10
             offset = offsetStr |> Str.toU64 |> Result.withDefault 0
-            FeedItems { limit, offset }
+            LoadMoreItems { limit, offset }
 
         _ -> Feed
 

@@ -15,12 +15,13 @@ effect = \javascriptCode -> (Attr.attribute "x-effect") javascriptCode
 ref : Str -> Attr.Attribute
 ref = \javascriptCode -> (Attr.attribute "x-ref") javascriptCode
 
-EventType : [Click]
+EventType : [Click, Custom Str]
 
 eventTypeToStr : EventType -> Str
 eventTypeToStr = \eventType ->
     when eventType is
         Click -> "click"
+        Custom str -> str
 
 on : EventType, Str -> Attr.Attribute
 on = \eventType, javascriptCode -> (Attr.attribute ("x-on:$(eventTypeToStr eventType)")) javascriptCode
