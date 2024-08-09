@@ -25,9 +25,6 @@ view = \{ route } ->
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js", Attr.defer "true"] [],
                 Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml imageElementJs],
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", Attr.defer "true"] [],
-                Html.link [Attr.rel "preconnect", Attr.href "https://fonts.googleapis.com"],
-                Html.link [Attr.rel "preconnect", Attr.href "https://fonts.gstatic.com"],
-                Html.link [Attr.rel "stylesheet", Attr.href "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"],
                 App.Styles.view,
             ],
         Html.body

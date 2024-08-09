@@ -19,6 +19,7 @@ import Ui.Swiper
 import Ui.Image
 import App.Link
 import Logger
+import Feed.Form
 # import pf.Sleep
 # import Ui.SwiperFeed
 
@@ -37,7 +38,7 @@ routeHx = \ctx, route ->
         Feed ->
             viewFeed |> Response.html |> Task.ok
 
-        LoadMoreItems mediaQuery ->
+        FeedItemsLoad mediaQuery ->
             queried =
                 ctx.mediaDb.find! {
                     limit: mediaQuery.limit,
@@ -51,6 +52,12 @@ routeHx = \ctx, route ->
             Logger.info! ctx.logger (Inspect.toStr got)
 
             queried.rows |> viewFeedItems mediaQuery |> Response.html |> Response.hxTrigger "feedLoadedMoreItems" |> Task.ok
+
+        Form r ->
+            Feed.Form.routeHx ctx r
+
+        Unknown ->
+            Response.redirect (Feed Feed) |> Task.ok
 
 viewChip : Str -> Html.Node
 viewChip = \text ->
@@ -117,7 +124,7 @@ viewFeed =
                                 Attr.class "flex items-center justify-center w-full h-full",
                                 Hx.swap OuterHtml,
                                 Hx.trigger Load,
-                                Hx.get (Feed.Route.encode (LoadMoreItems defaultMediaQuery)),
+                                Hx.get (Feed.Route.encode (FeedItemsLoad defaultMediaQuery)),
 
                             ]
                             [
@@ -169,7 +176,7 @@ viewFeedItemLoadMore = \mediaQuery ->
             Attr.class "w-full h-full flex items-center justify-center",
             Hx.swap OuterHtml,
             Hx.trigger Intersect,
-            Hx.get (Feed.Route.encode (LoadMoreItems { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
+            Hx.get (Feed.Route.encode (FeedItemsLoad { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
         ]
         [
             Ui.Spinner.view,
