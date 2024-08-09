@@ -99,6 +99,9 @@ viewFeed =
                 ]
                 [
                     viewChip "Popular",
+                    # Ui.iconButton [] [
+                    #     Ui.Icon.
+                    # ],
                 ],
             Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
                 # Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml jsRemoveFirstChildren],
