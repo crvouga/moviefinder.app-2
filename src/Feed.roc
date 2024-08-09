@@ -66,24 +66,25 @@ viewChip = \text ->
                 [Html.text text],
         ]
 
-jsRemoveFirstChildren : Str
-jsRemoveFirstChildren =
-    """
-    document.addEventListener('feedLoadedMoreItems', function () {
-        console.log('feedLoadedMoreItems');
-        const swiperElement = document.querySelector('swiper-container');
-        if(!swiperElement) {
-            return;
-        }
-        const swiper = swiperElement.swiper
-        const slideIndexes = []
-        for (let i = 0; i < 20; i++) {
-            slideIndexes.push(i);
-        }
-        console.log('slideIndexes', slideIndexes);
-        swiper.removeSlide(slideIndexes);
-    })
-    """
+# jsRemoveFirstChildren : Str
+# jsRemoveFirstChildren =
+#     """
+#     document.addEventListener('feedLoadedMoreItems', function () {
+#         console.log('feedLoadedMoreItems');
+#         const swiperElement = document.querySelector('swiper-container');
+#         if(!swiperElement) {
+#             return;
+#         }
+#         const swiper = swiperElement.swiper
+#         const slideIndexes = []
+#         for (let i = 0; i < 20; i++) {
+#             slideIndexes.push(i);
+#         }
+#         console.log('slideIndexes', slideIndexes);
+#         swiper.removeSlide(slideIndexes);
+#     })
+#     """
+
 viewFeed : Html.Node
 viewFeed =
     Html.div
@@ -100,7 +101,7 @@ viewFeed =
                     viewChip "Popular",
                 ],
             Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
-                Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml jsRemoveFirstChildren],
+                # Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml jsRemoveFirstChildren],
                 Ui.Swiper.container
                     [
                         Attr.class "w-full max-w-full h-full max-h-full",
