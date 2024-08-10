@@ -23,7 +23,7 @@ get : Config, Str -> Task.Task Str [NotFound, Errored Str]
 get = \config, key ->
     rows =
         SQLite3.execute {
-            path: config.databaseUrl,
+            path: removeSqlitePrefix config.databaseUrl,
             query: "SELECT value FROM key_value WHERE key = :key;",
             bindings: [{ name: ":key", value: key }],
         }

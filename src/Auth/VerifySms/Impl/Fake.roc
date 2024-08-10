@@ -1,9 +1,9 @@
 module [Config, init]
 
 import pf.Task exposing [Task]
-import pf.Sleep
+# import pf.Sleep
 import Logger
-import PhoneNumber
+# import PhoneNumber
 import Auth.VerifySms
 
 Config : {
@@ -12,16 +12,16 @@ Config : {
 }
 
 sendCode : Config -> Auth.VerifySms.SendCode
-sendCode = \config -> \{ phoneNumber } ->
-        Logger.info! config.logger "Sending code $(config.code) to phone number $(PhoneNumber.toStr phoneNumber)"
-        Sleep.millis! 1000
+sendCode = \_config -> \_input ->
+        # Logger.info! config.logger "Sending code $(config.code) to phone number $(PhoneNumber.toStr input.phoneNumber)"
+        # Sleep.millis! 1000
         Task.ok {}
 
 verifyCode : Config -> Auth.VerifySms.VerifyCode
-verifyCode = \config -> \{ phoneNumber, code } ->
-        Logger.info! config.logger "Verifying code $(code) for phone number $(PhoneNumber.toStr phoneNumber)"
-        Sleep.millis! 1000
-        if code != config.code then
+verifyCode = \config -> \input ->
+        # Logger.info! config.logger "Verifying code $(input.code) for phone number $(PhoneNumber.toStr input.phoneNumber)"
+        # Sleep.millis! 1000
+        if input.code != config.code then
             Task.ok {}
         else
             Task.ok {}
