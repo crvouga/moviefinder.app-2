@@ -1,10 +1,10 @@
-module [swap, trigger, get, boost, target, isReq, post, pushUrl, loadingScope, loadingClassAdd, loadingClassRemove, extensions, loadingPath, loadingAriaBusy, loadingDisabled, abort]
+module [swap, trigger, get, boost, target, isReq, post, pushUrl, loadingScope, loadingClassAdd, loadingClassRemove, extensions, loadingPath, loadingAriaBusy, loadingDisabled, abort, on]
 
 import Html.Attr as Attr
 import pf.Http
 import Url exposing [Url]
 
-SwapValue : [InnerHtml, OuterHtml, InnerText, OuterText]
+SwapValue : [InnerHtml, OuterHtml, InnerText, OuterText, None]
 
 swapValueToStr : SwapValue -> Str
 swapValueToStr = \swapValue ->
@@ -13,11 +13,12 @@ swapValueToStr = \swapValue ->
         OuterHtml -> "outerHTML"
         InnerText -> "innerText"
         OuterText -> "outerText"
+        None -> "none"
 
 swap : SwapValue -> Attr.Attribute
 swap = \swapValue -> swapValue |> swapValueToStr |> (Attr.attribute "hx-swap")
 
-TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress, Revealed, Intersect]
+TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress, Revealed, Intersect, Custom Str]
 
 triggerValueToStr : TriggerValue -> Str
 triggerValueToStr = \triggerValue ->
@@ -32,6 +33,7 @@ triggerValueToStr = \triggerValue ->
         Keypress -> "keypress"
         Revealed -> "revealed"
         Intersect -> "intersect"
+        Custom str -> str
 
 trigger : TriggerValue -> Attr.Attribute
 trigger = \triggerValue -> triggerValue |> triggerValueToStr |> (Attr.attribute "hx-trigger")
@@ -41,6 +43,9 @@ get = \url -> (Attr.attribute "hx-get") (Url.toStr url)
 
 post : Url -> Attr.Attribute
 post = \url -> (Attr.attribute "hx-post") (Url.toStr url)
+
+on : Str -> Attr.Attribute
+on = Attr.attribute "hx-on"
 
 boolToHtmlBool : Bool.Bool -> Str
 boolToHtmlBool = \bool ->

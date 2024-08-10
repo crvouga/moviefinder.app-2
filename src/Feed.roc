@@ -15,12 +15,12 @@ import Ui.Spinner
 import App.BottomNavigation
 import ImageSet
 import Ui.Swiper
-# import X
 import Ui.Image
 import App.Link
 import Logger
 import Feed.Form
 # import pf.Sleep
+import X
 # import Ui.SwiperFeed
 
 defaultMediaQuery : {
@@ -92,12 +92,30 @@ viewChip = \text ->
 #     })
 #     """
 
+# https://v9.swiperjs.com/element
+jsWatchSlideChanged : Str
+jsWatchSlideChanged =
+    """
+    const swiperEl = document.querySelector('swiper-container');
+
+    setTimeout(() => {
+        console.log("updated")
+        swiperEl.addEventListener('progress', (event) => {
+            const [swiper, progress] = event.detail;
+        });
+
+        swiperEl.addEventListener('slidechange', (event) => {
+            console.log('slide changed');
+        });
+    }, 3000)
+
+    """
+
 viewFeed : Html.Node
 viewFeed =
     Html.div
         [
             Attr.class "w-full h-full flex flex-col",
-            (Attr.attribute "hx-on") "htmx:afterSwap: console.log('swapped')",
         ]
         [
             Html.div
@@ -111,12 +129,13 @@ viewFeed =
                     # ],
                 ],
             Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
-                # Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml jsRemoveFirstChildren],
+                Html.script [] [Html.dangerouslyIncludeUnescapedHtml jsWatchSlideChanged],
                 Ui.Swiper.container
                     [
                         Attr.class "w-full max-w-full h-full max-h-full",
                         Ui.Swiper.slidesPerView 1,
                         Ui.Swiper.direction Vertical,
+                        X.on (Custom "slidechange") "console.log('hello')",
                     ]
                     [
                         Html.div
