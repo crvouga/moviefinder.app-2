@@ -128,7 +128,7 @@ viewFeed =
 
                             ]
                             [
-                                Ui.Spinner.view,
+                                Ui.Spinner.view {},
                             ],
                     ],
             ],
@@ -179,5 +179,5 @@ viewFeedItemLoadMore = \mediaQuery ->
             Hx.get (Feed.Route.encode (FeedItemsLoad { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
         ]
         [
-            Ui.Spinner.view,
+            Ui.Spinner.view {},
         ]

@@ -22,6 +22,7 @@ view = \{ route } ->
                 Html.link [Attr.rel "icon", Attr.href "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><text y='32' font-size='32'>🍿</text></svg>"],
                 Html.script [Attr.src "https://cdn.tailwindcss.com"] [],
                 Html.script [Attr.src "https://unpkg.com/htmx.org@2.0.1", Attr.defer "true"] [],
+                Html.script [Attr.src "https://unpkg.com/htmx.org@1.9.12/dist/ext/loading-states.js", Attr.defer "true"] [],
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js", Attr.defer "true"] [],
                 Html.script [Attr.type "module"] [Html.dangerouslyIncludeUnescapedHtml imageElementJs],
                 Html.script [Attr.src "https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js", Attr.defer "true"] [],
@@ -37,6 +38,7 @@ view = \{ route } ->
                         Attr.class "w-full max-w-[500px] h-full max-h-[800px] border rounded overflow-hidden",
                         Attr.id "app",
                         Hx.boost Bool.true,
+                        Hx.extensions ["loading-states"],
                     ]
                     [
                         Html.div
@@ -47,7 +49,7 @@ view = \{ route } ->
                                 Hx.get (Route.encode route),
                             ]
                             [
-                                Ui.Spinner.view,
+                                Ui.Spinner.view {},
                             ],
                     ],
             ],

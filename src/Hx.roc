@@ -1,4 +1,4 @@
-module [swap, trigger, get, boost, target, isReq, post, pushUrl]
+module [swap, trigger, get, boost, target, isReq, post, pushUrl, loadingScope, loadingClassAdd, loadingClassRemove, extensions, loadingPath, loadingAriaBusy, loadingDisabled, abort]
 
 import Html.Attr as Attr
 import pf.Http
@@ -60,3 +60,30 @@ isReq = \req -> List.any req.headers (\header -> header.name == "hx-request")
 
 pushUrl : Attr.Attribute
 pushUrl = (Attr.attribute "hx-push-url") "true"
+
+# https://v1.htmx.org/extensions/loading-states/
+
+loadingClassAdd : Str -> Attr.Attribute
+loadingClassAdd = Attr.attribute "data-loading-class"
+
+loadingClassRemove : Str -> Attr.Attribute
+loadingClassRemove = Attr.attribute "data-loading-class-remove"
+
+loadingScope : Attr.Attribute
+loadingScope = (Attr.attribute "data-loading-states") ""
+
+loadingPath : Url -> Attr.Attribute
+loadingPath = \url -> (Attr.attribute "data-loading-path") (Url.toStr url)
+
+extensions : List Str -> Attr.Attribute
+extensions = \extenstionList -> (Attr.attribute "hx-ext") (Str.joinWith extenstionList " ")
+
+loadingAriaBusy : Attr.Attribute
+loadingAriaBusy = (Attr.attribute "data-loading-aria-busy") ""
+
+loadingDisabled : Attr.Attribute
+loadingDisabled = (Attr.attribute "data-loading-disable") ""
+
+abort : Str -> Str
+abort = \cssSelector ->
+    "htmx.trigger('$(cssSelector)', 'htmx:abort')"

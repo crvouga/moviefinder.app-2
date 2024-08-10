@@ -12,7 +12,9 @@ import Ctx
 import Auth.Login.Route
 import Route
 import Hx
+import Ui.Alert
 import PhoneNumber
+import Auth.VerifyCodeErr as VerifyCodeErr exposing [VerifyCodeErr]
 
 routeHx : Ctx.Ctx, Auth.Login.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -36,23 +38,25 @@ routeHx = \ctx, route ->
 
                     when sent is
                         Ok _ ->
-                            Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
+                            Login (VerifyCode { phoneNumber, error: None }) |> Response.redirect |> Task.ok
 
                         Err _ ->
-                            Login (VerifyCode { phoneNumber, error: "" }) |> Response.redirect |> Task.ok
+                            Login (VerifyCode { phoneNumber, error: None }) |> Response.redirect |> Task.ok
 
-        VerifyCode { phoneNumber } ->
-            viewVerifyCode { phoneNumber } |> Response.html |> Task.ok
+        VerifyCode { phoneNumber, error } ->
+            viewVerifyCode { phoneNumber, error } |> Response.html |> Task.ok
 
         ClickedVerifyCode { phoneNumber } ->
-            verifiedCode <- (ctx.verifySms.verifyCode { phoneNumber, code: "123" }) |> Task.attempt
+            code = ctx.req.formData |> Dict.get "code" |> Result.withDefault ""
+
+            verifiedCode <- (ctx.verifySms.verifyCode { phoneNumber, code }) |> Task.attempt!
 
             when verifiedCode is
                 Ok _ ->
                     Login VerifiedCode |> Response.redirect |> Task.ok
 
-                Err _ ->
-                    (Login (VerifyCode { phoneNumber, error: "Something went wrong" })) |> Response.redirect |> Task.ok
+                Err err ->
+                    (Login (VerifyCode { phoneNumber, error: Some err })) |> Response.redirect |> Task.ok
 
         VerifiedCode ->
             viewVerifiedCode |> Response.html |> Task.ok
@@ -63,15 +67,21 @@ viewSendCode = Html.div
         Attr.class "w-full h-full flex flex-col",
     ]
     [
-        App.TopBar.view { title: "Login with phone", back: Account Account },
+        App.TopBar.view {
+            title: "Login with phone",
+            back: Account Account,
+            onBack: Hx.abort "#send-code-form",
+        },
         Html.form
             [
                 Attr.class "flex flex-col w-full flex-1 p-4 gap-8",
+                Attr.id "#send-code-form",
                 Hx.swap InnerHtml,
                 Hx.target "#app",
                 Hx.trigger Submit,
                 Hx.pushUrl,
                 Hx.post (Auth.Login.Route.encode ClickedSendCode),
+                Hx.loadingPath (Auth.Login.Route.encode ClickedSendCode),
             ]
             [
                 Ui.TextField.view {
@@ -85,8 +95,9 @@ viewSendCode = Html.div
             ],
     ]
 
-viewVerifyCode : { phoneNumber : PhoneNumber.PhoneNumber } -> Html.Node
-viewVerifyCode = \{ phoneNumber } -> Html.div
+viewVerifyCode : { phoneNumber : PhoneNumber.PhoneNumber, error : [Some VerifyCodeErr, None] } -> Html.Node
+viewVerifyCode = \input ->
+    Html.div
         [
             Attr.class "w-full h-full flex flex-col",
         ]
@@ -99,11 +110,13 @@ viewVerifyCode = \{ phoneNumber } -> Html.div
                     Hx.target "#app",
                     Hx.trigger Submit,
                     Hx.pushUrl,
-                    Hx.post (Auth.Login.Route.encode (ClickedVerifyCode { phoneNumber })),
+                    Hx.post (Auth.Login.Route.encode (ClickedVerifyCode { phoneNumber: input.phoneNumber })),
+                    Hx.loadingPath (Auth.Login.Route.encode (ClickedVerifyCode { phoneNumber: input.phoneNumber })),
+
                 ]
                 [
                     Ui.Typography.view {
-                        text: "Enter the code sent to $(PhoneNumber.format phoneNumber)",
+                        text: "Enter the code sent to $(PhoneNumber.format input.phoneNumber)",
                         class: "text-lg font-bold pt-4",
                     },
                     Ui.TextField.view {
@@ -114,8 +127,21 @@ viewVerifyCode = \{ phoneNumber } -> Html.div
                     Ui.Button.button [] {
                         label: "Verify code",
                     },
+                    viewVerifyCodeErr input.error,
                 ],
         ]
+
+viewVerifyCodeErr : [Some VerifyCodeErr, None] -> Html.Node
+viewVerifyCodeErr = \error ->
+    when error is
+        None ->
+            Html.fragment []
+
+        Some err ->
+            Ui.Alert.view {
+                variant: Error,
+                text: VerifyCodeErr.toStr err,
+            }
 
 viewVerifiedCode : Html.Node
 viewVerifiedCode = Html.div

@@ -24,6 +24,10 @@ styles =
         scrollbar-width: none;
         scrollbar-color: transparent transparent;
     }
+
+    [data-loading] {
+      display: none;
+    }
     """
 
 view : Html.Node

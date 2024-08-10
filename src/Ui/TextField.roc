@@ -2,6 +2,7 @@ module [view]
 
 import Html
 import Html.Attr as Attr
+import Hx
 
 InputType : [Tel, Text]
 
@@ -22,12 +23,18 @@ view : { label : Str, name : Str, inputType ? InputType, required ? Bool } -> Ht
 view = \{ label, name, inputType ? Text, required ? Bool.false } ->
     Html.div
         [
-            Attr.class "w-full flex flex-col gap-2",
+            Attr.classList [
+                "w-full flex flex-col gap-2 transition-opacity",
+            ],
+            Hx.loadingClassAdd "opacity-70 cursor-not-allowed",
         ]
         [
             Html.label [Attr.class "font-bold"] [Html.text label],
             Html.input [
-                Attr.class "w-full border bg-neutral-800 p-4 text-xl rounded",
+                Attr.classList [
+                    "w-full border bg-neutral-800 p-4 text-xl rounded",
+                ],
+                Hx.loadingDisabled,
                 Attr.name name,
                 inputType |> inputTypeToHtmlValue |> Attr.type,
                 required |> boolToStr |> Attr.required,

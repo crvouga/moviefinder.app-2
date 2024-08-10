@@ -67,7 +67,7 @@ viewDetailsLoading = \mediaQuery -> Html.div
                     Attr.class "w-full flex flex-1 flex-col items-center justify-start p-8",
                 ]
                 [
-                    Ui.Spinner.view,
+                    Ui.Spinner.view {},
                 ],
         ]
 
@@ -206,7 +206,7 @@ viewLoadVideoPlayer = \mediaVideo ->
             Hx.get (Media.Details.Route.encode (Video mediaVideo)),
         ]
         [
-            Ui.Spinner.view,
+            Ui.Spinner.view {},
         ]
 
 viewVideoList : Media.Media -> Html.Node
