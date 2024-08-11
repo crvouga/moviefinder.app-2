@@ -35,11 +35,11 @@ get = \config, key ->
         Ok _ -> Task.err (Errored "unexpected values returned, expected key and value")
         Err (SQLError _ msg) -> Task.err (Errored msg)
 
-set : Config, Str, Str -> Task.Task {} [Errored Str]
-set = \config, key, value ->
+put : Config, Str, Str -> Task.Task {} [Errored Str]
+put = \config, key, value ->
     executed <- SQLite3.execute {
-            path: config.databaseUrl,
-            query: "INSERT INTO key_value(key, value) VALUES (:key, :value)",
+            path: removeSqlitePrefix config.databaseUrl,
+            query: "INSERT OR REPLACE INTO key_value(key, value) VALUES (:key, :value)",
             bindings: [{ name: ":key", value: key }, { name: ":value", value: value }],
         }
         |> Task.attempt
@@ -51,5 +51,5 @@ set = \config, key, value ->
 init : Config -> KeyValueStore.KeyValueStore
 init = \config -> {
     get: \key -> get config key,
-    set: \key, value -> set config key value,
+    put: \key, value -> put config key value,
 }

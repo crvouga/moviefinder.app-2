@@ -1,4 +1,4 @@
-module [container, slide, direction, slidesPerView]
+module [container, slide, direction, slidesPerView, speed]
 
 import Html
 import Html.Attr as Attr
@@ -21,3 +21,5 @@ directionToStr = \directionValue ->
 direction : Direction -> Attr.Attribute
 direction = \directionValue -> (Attr.attribute "direction") (directionToStr directionValue)
 
+speed : U64 -> Attr.Attribute
+speed = \speedValue -> (Attr.attribute "speed") (Num.toStr speedValue)

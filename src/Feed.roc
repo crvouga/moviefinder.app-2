@@ -18,10 +18,11 @@ import Ui.Swiper
 import Ui.Image
 import App.Link
 import Logger
+import Url
 import Feed.Form
+import Feed.Feed exposing [Feed]
 # import pf.Sleep
-import X
-# import Ui.SwiperFeed
+# import X
 
 defaultMediaQuery : {
     limit : U64,
@@ -32,6 +33,11 @@ defaultMediaQuery = {
     offset: 0,
 }
 
+FeedItem : {
+    index : U64,
+    media : Media.Media,
+}
+
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
@@ -39,22 +45,57 @@ routeHx = \ctx, route ->
             viewFeed |> Response.html |> Task.ok
 
         FeedItemsLoad mediaQuery ->
+            got <- ctx.feedDb.get "feed" |> Task.attempt
+
+            fallback : Feed
+            fallback = {
+                feedId: "feed",
+                activeIndex: 0,
+            }
+
+            feed = got |> Result.withDefault fallback
+
             queried =
                 ctx.mediaDb.find! {
                     limit: mediaQuery.limit,
-                    offset: mediaQuery.offset,
+                    offset: mediaQuery.offset + feed.activeIndex,
                     orderBy: Desc MediaId,
                     where: And [],
                 }
+            Logger.info! ctx.logger (Inspect.toStr feed)
 
-            got <- ctx.keyValueStore.get "feed" |> Task.attempt
+            feedItems =
+                queried.rows
+                |> List.mapWithIndex (\media, index -> { media, index: index + mediaQuery.offset })
 
-            Logger.info! ctx.logger (Inspect.toStr got)
-
-            queried.rows |> viewFeedItems mediaQuery |> Response.html |> Response.hxTrigger "feedLoadedMoreItems" |> Task.ok
+            feedItems
+            |> viewFeedItems mediaQuery
+            |> Response.html
+            |> Task.ok
 
         Form r ->
             Feed.Form.routeHx ctx r
+
+        ChangedSlide payload ->
+            got <- ctx.feedDb.get "feed" |> Task.attempt
+
+            fallback : Feed
+            fallback = {
+                feedId: "feed",
+                activeIndex: payload.index - 1,
+            }
+
+            feed = got |> Result.withDefault fallback
+
+            feedNext : Feed
+            feedNext = { feed & activeIndex: payload.index }
+            Logger.info! ctx.logger (Inspect.toStr got)
+
+            put <- ctx.feedDb.put feedNext |> Task.attempt
+
+            Logger.info! ctx.logger (Inspect.toStr put)
+
+            Html.fragment [] |> Response.html |> Task.ok
 
         Unknown ->
             Response.redirect (Feed Feed) |> Task.ok
@@ -73,54 +114,34 @@ viewChip = \text ->
                 [Html.text text],
         ]
 
-# jsRemoveFirstChildren : Str
-# jsRemoveFirstChildren =
-#     """
-#     document.addEventListener('feedLoadedMoreItems', function () {
-#         console.log('feedLoadedMoreItems');
-#         const swiperElement = document.querySelector('swiper-container');
-#         if(!swiperElement) {
-#             return;
-#         }
-#         const swiper = swiperElement.swiper
-#         const slideIndexes = []
-#         for (let i = 0; i < 20; i++) {
-#             slideIndexes.push(i);
-#         }
-#         console.log('slideIndexes', slideIndexes);
-#         swiper.removeSlide(slideIndexes);
-#     })
-#     """
-
-# https://v9.swiperjs.com/element
-jsWatchSlideChanged : Str
-jsWatchSlideChanged =
+jsWatchSlideChange : Str
+jsWatchSlideChange =
     """
-    const swiperEl = document.querySelector('swiper-container');
-
-    setTimeout(() => {
-        console.log("updated")
-        swiperEl.addEventListener('progress', (event) => {
-            const [swiper, progress] = event.detail;
-        });
-
-        swiperEl.addEventListener('slidechange', (event) => {
-            console.log('slide changed');
-        });
-    }, 3000)
-
+    swiperEl = document.querySelector('swiper-container')
+    swiperEl.addEventListener('swiperslidechange', (e) => {
+        const swiper = e.detail[0]
+        const activeIndex = swiper.activeIndex
+        const activeSlide = swiper.slides[activeIndex]
+        const feedIndex = parseInt(activeSlide.getAttribute('data-feed-index'), 10)
+        if(typeof feedIndex !== 'number' || Number.isNaN(feedIndex)) {
+            return
+        }
+        const endpointTemplate = "$((ChangedSlide { index: 0 }) |> Feed.Route.encode |> Url.toStr)"
+        const endpoint = endpointTemplate.replace("0", feedIndex)
+        htmx.ajax('POST', endpoint, { swap: 'none' })
+    })
     """
 
 viewFeed : Html.Node
 viewFeed =
     Html.div
         [
-            Attr.class "w-full h-full flex flex-col",
+            Attr.class "w-full h-full flex flex-col overflow-hidden",
         ]
         [
             Html.div
                 [
-                    Attr.class "w-full h-16 flex items-center justify-start px-4 border-b",
+                    Attr.class "w-full h-16 flex items-center justify-start px-4 border-b overflow-hidden",
                 ]
                 [
                     viewChip "Popular",
@@ -128,14 +149,14 @@ viewFeed =
                     #     Ui.Icon.
                     # ],
                 ],
+            Html.script [] [Html.dangerouslyIncludeUnescapedHtml jsWatchSlideChange],
             Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
-                Html.script [] [Html.dangerouslyIncludeUnescapedHtml jsWatchSlideChanged],
                 Ui.Swiper.container
                     [
                         Attr.class "w-full max-w-full h-full max-h-full",
                         Ui.Swiper.slidesPerView 1,
                         Ui.Swiper.direction Vertical,
-                        X.on (Custom "slidechange") "console.log('hello')",
+                        Ui.Swiper.speed 300,
                     ]
                     [
                         Html.div
@@ -154,36 +175,37 @@ viewFeed =
             App.BottomNavigation.view Home,
         ]
 
-viewFeedItems : List Media.Media, { limit : U64, offset : U64 } -> Html.Node
-viewFeedItems = \mediaList, mediaQuery ->
+viewFeedItems : List FeedItem, { limit : U64, offset : U64 } -> Html.Node
+viewFeedItems = \feedItems, mediaQuery ->
     Html.fragment
         (
             List.concat
-                (List.map mediaList viewFeedItem)
+                (List.map feedItems viewFeedItem)
                 (
-                    if (List.len mediaList) > 0 then
+                    if (List.len feedItems) > 0 then
                         [viewFeedItemLoadMore mediaQuery]
                     else
                         []
                 )
         )
 
-viewFeedItem : Media.Media -> Html.Node
-viewFeedItem = \media ->
+viewFeedItem : FeedItem -> Html.Node
+viewFeedItem = \feedItem ->
     Ui.Swiper.slide
         [
             Attr.class "w-full h-full flex flex-col items-center justify-center",
+            (Attr.attribute "data-feed-index") (Num.toStr feedItem.index),
         ]
         [
             App.Link.view
-                (Media (Details { mediaId: media.mediaId, mediaType: media.mediaType }))
+                (Media (Details { mediaId: feedItem.media.mediaId, mediaType: feedItem.media.mediaType }))
                 [
                     Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center",
                 ]
                 [
                     Ui.Image.view [
                         Attr.class "w-full h-full object-cover",
-                        Attr.src (ImageSet.highestRes media.mediaPoster),
+                        Attr.src (ImageSet.highestRes feedItem.media.mediaPoster),
                     ],
                 ],
         ]

@@ -5,6 +5,7 @@ import Auth.VerifySms.Impl
 import Media.MediaDb.Impl
 import KeyValueStore.Impl
 import Logger
+import Feed.FeedDb.Impl
 import Request
 
 logger = Logger.init ["app"]
@@ -17,6 +18,12 @@ Config : {
 init : Config, Request.Request -> Ctx.Ctx
 init = \config, req -> {
     keyValueStore: KeyValueStore.Impl.init (Sqlite { databaseUrl: config.databaseUrl, logger: Logger.init ["key-value-store", "sqlite"] }),
+    feedDb: Feed.FeedDb.Impl.init
+        (
+            KeyValueStore {
+                keyValueStore: KeyValueStore.Impl.init (Sqlite { databaseUrl: config.databaseUrl, logger: Logger.init ["key-value-store", "sqlite"] }),
+            }
+        ),
     verifySms: Auth.VerifySms.Impl.init
         (
             Fake {

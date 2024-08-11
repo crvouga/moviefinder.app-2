@@ -1,5 +1,5 @@
 # https://alpinejs.dev/
-module [data, show, effect, ref, on]
+module [data, show, effect, ref, on, init]
 
 import Html.Attr as Attr
 
@@ -24,4 +24,7 @@ eventTypeToStr = \eventType ->
         Custom str -> str
 
 on : EventType, Str -> Attr.Attribute
-on = \eventType, javascriptCode -> (Attr.attribute ("x-on:$(eventTypeToStr eventType)")) javascriptCode
+on = \eventType, javascriptCode -> (Attr.attribute ("@$(eventTypeToStr eventType)")) javascriptCode
+
+init : Str -> Attr.Attribute
+init = \javascriptCode -> (Attr.attribute "x-init") javascriptCode

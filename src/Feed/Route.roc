@@ -2,25 +2,35 @@ module [Route, encode, decode]
 import Url exposing [Url]
 import Feed.Form.Route
 
-Route : [Feed, FeedItemsLoad { limit : U64, offset : U64 }, Form Feed.Form.Route.Route, Unknown]
+Route : [Feed, FeedItemsLoad { limit : U64, offset : U64 }, Form Feed.Form.Route.Route, ChangedSlide { index : U64 }, Unknown]
 
 encode : Route -> Url
 encode = \route ->
     when route is
-        Feed -> "/feed" |> Url.fromStr
+        Feed ->
+            "/feed" |> Url.fromStr
+
         FeedItemsLoad mediaQuery ->
             "/feed/feed-items-load"
             |> Url.fromStr
             |> Url.appendParam "limit" (Num.toStr mediaQuery.limit)
             |> Url.appendParam "offset" (Num.toStr mediaQuery.offset)
 
-        Form r -> Feed.Form.Route.encode r
-        Unknown -> Url.fromStr "/"
+        ChangedSlide payload ->
+            "/feed/changed-slide" |> Url.fromStr |> Url.appendParam "index" (Num.toStr payload.index)
+
+        Form r ->
+            Feed.Form.Route.encode r
+
+        Unknown ->
+            Url.fromStr "/"
 
 decode : Url -> Route
 decode = \url ->
     when Url.path url is
-        "/feed" -> Feed
+        "/feed" ->
+            Feed
+
         "/feed/feed-items-load" ->
             queryParams = Url.queryParams url
             limitStr = queryParams |> Dict.get "limit" |> Result.withDefault ""
@@ -29,5 +39,10 @@ decode = \url ->
             offset = offsetStr |> Str.toU64 |> Result.withDefault 0
             FeedItemsLoad { limit, offset }
 
-        _ -> Unknown
+        "/feed/changed-slide" ->
+            queryParams = Url.queryParams url
+            index = queryParams |> Dict.get "index" |> Result.try Str.toU64 |> Result.withDefault 0
+            ChangedSlide { index }
 
+        _ ->
+            Unknown

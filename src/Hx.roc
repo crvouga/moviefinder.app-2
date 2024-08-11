@@ -1,4 +1,4 @@
-module [swap, trigger, get, boost, target, isReq, post, pushUrl, loadingScope, loadingClassAdd, loadingClassRemove, extensions, loadingPath, loadingAriaBusy, loadingDisabled, abort, on]
+module [swap, trigger, get, boost, target, isReq, post, pushUrl, loadingScope, loadingClassAdd, loadingClassRemove, extensions, loadingPath, loadingAriaBusy, loadingDisabled, abort, on, vals]
 
 import Html.Attr as Attr
 import pf.Http
@@ -18,7 +18,7 @@ swapValueToStr = \swapValue ->
 swap : SwapValue -> Attr.Attribute
 swap = \swapValue -> swapValue |> swapValueToStr |> (Attr.attribute "hx-swap")
 
-TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress, Revealed, Intersect, Custom Str]
+TriggerValue : [Load, Click, Submit, Input, Change, Keyup, Keydown, Keypress, Revealed, Intersect, IntersectOnce, Custom Str]
 
 triggerValueToStr : TriggerValue -> Str
 triggerValueToStr = \triggerValue ->
@@ -33,6 +33,7 @@ triggerValueToStr = \triggerValue ->
         Keypress -> "keypress"
         Revealed -> "revealed"
         Intersect -> "intersect"
+        IntersectOnce -> "intersect once"
         Custom str -> str
 
 trigger : TriggerValue -> Attr.Attribute
@@ -92,3 +93,6 @@ loadingDisabled = (Attr.attribute "data-loading-disable") ""
 abort : Str -> Str
 abort = \cssSelector ->
     "htmx.trigger('$(cssSelector)', 'htmx:abort')"
+
+vals : Str -> Attr.Attribute
+vals = \javascriptCode -> (Attr.attribute "hx-vals") "js:$(javascriptCode)"

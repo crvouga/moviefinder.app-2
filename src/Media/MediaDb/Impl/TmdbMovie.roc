@@ -2,6 +2,7 @@ module [init, Config, getDiscoverMovie]
 
 import pf.Task exposing [Task]
 import pf.Http
+import Pagination
 import Media.MediaDb exposing [MediaDb, Find, FindById, MediaQuery]
 import Media exposing [Media]
 import Logger
@@ -11,6 +12,7 @@ import ImageSet
 import MediaId
 import MediaVideo
 import Url
+import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -49,16 +51,26 @@ emptyResult = {
     results: [],
 }
 
+pageSize = 20
+
 getDiscoverMovie : Config, MediaQuery -> Task (List Media) []
 getDiscoverMovie = \config, mediaQuery ->
     task =
-        page = mediaQuery.offset // mediaQuery.limit + 1
+        pageBased = Pagination.toPageBased pageSize {
+            limit: mediaQuery.limit,
+            offset: mediaQuery.offset,
+        }
+        #
         url =
             # https://developer.themoviedb.org/reference/discover-movie
             "/discover/movie"
             |> Url.fromStr
-            |> Url.appendParam "page" (page |> Num.toStr)
+            |> Url.appendParam "page" (pageBased.page |> Num.toStr)
             |> Url.toStr
+        #
+        #
+        #
+        Stdout.line! url
 
         response = Http.send! (Tmdb.toRequest config url)
         discoverMovieResult = Json.decodeWithFallback (Str.toUtf8 response) emptyResult
