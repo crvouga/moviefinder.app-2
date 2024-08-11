@@ -131,8 +131,8 @@ jsWatchSlideChange =
         if(typeof feedIndex !== 'number' || Number.isNaN(feedIndex)) {
             return
         }
-        const endpointTemplate = "$((ChangedSlide { index: 0 }) |> Feed.Route.encode |> Url.toStr)"
-        const endpoint = endpointTemplate.replace("0", feedIndex)
+        const endpointTemplate = '$((ChangedSlide { index: 0 }) |> Feed.Route.encode |> Url.toStr)'
+        const endpoint = endpointTemplate.replace('0', feedIndex)
         htmx.ajax('POST', endpoint, { swap: 'none' })
     })
     """
