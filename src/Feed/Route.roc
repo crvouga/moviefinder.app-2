@@ -10,11 +10,9 @@ encode = \route ->
         Feed ->
             "/feed" |> Url.fromStr
 
-        FeedItemsLoad mediaQuery ->
+        FeedItemsLoad _ ->
             "/feed/feed-items-load"
             |> Url.fromStr
-            |> Url.appendParam "limit" (Num.toStr mediaQuery.limit)
-            |> Url.appendParam "offset" (Num.toStr mediaQuery.offset)
 
         ChangedSlide payload ->
             "/feed/changed-slide" |> Url.fromStr |> Url.appendParam "index" (Num.toStr payload.index)

@@ -22,6 +22,7 @@ import Url
 import Feed.Form
 import Feed.Feed exposing [Feed]
 # import pf.Sleep
+# import Pagination
 # import X
 
 defaultMediaQuery : {
@@ -37,6 +38,8 @@ FeedItem : {
     index : U64,
     media : Media.Media,
 }
+
+limit = 10
 
 routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
@@ -54,11 +57,13 @@ routeHx = \ctx, route ->
             }
 
             feed = got |> Result.withDefault fallback
+            #
+            Logger.info! ctx.logger (Inspect.toStr feed)
 
             queried =
                 ctx.mediaDb.find! {
-                    limit: mediaQuery.limit,
-                    offset: mediaQuery.offset + feed.activeIndex,
+                    limit,
+                    offset: feed.activeIndex,
                     orderBy: Desc MediaId,
                     where: And [],
                 }
@@ -66,7 +71,7 @@ routeHx = \ctx, route ->
 
             feedItems =
                 queried.rows
-                |> List.mapWithIndex (\media, index -> { media, index: index + mediaQuery.offset })
+                |> List.mapWithIndex (\media, indexWithinPage -> { media, index: indexWithinPage + feed.activeIndex })
 
             feedItems
             |> viewFeedItems mediaQuery

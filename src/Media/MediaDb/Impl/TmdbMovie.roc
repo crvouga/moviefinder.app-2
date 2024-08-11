@@ -67,17 +67,15 @@ getDiscoverMovie = \config, mediaQuery ->
             |> Url.fromStr
             |> Url.appendParam "page" (pageBased.page |> Num.toStr)
             |> Url.toStr
-        #
-        #
-        #
-        Stdout.line! url
 
         response = Http.send! (Tmdb.toRequest config url)
         discoverMovieResult = Json.decodeWithFallback (Str.toUtf8 response) emptyResult
 
         tmdbConfig = Tmdb.getTmdbConfig! config
 
-        mediaList = List.map discoverMovieResult.results \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
+        mediaList =
+            discoverMovieResult.results
+            |> List.map \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
 
         Task.ok mediaList
 
@@ -108,7 +106,18 @@ tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
 
 find : Config -> Find
 find = \config -> \queryInput ->
-        rows = getDiscoverMovie! config queryInput
+        page = getDiscoverMovie! config queryInput
+        nextPage = getDiscoverMovie! config { queryInput & offset: queryInput.offset + pageSize }
+
+        indexWithinPage = Pagination.toIndexWithinPage pageSize {
+            limit: queryInput.limit,
+            offset: queryInput.offset,
+        }
+        rows =
+            List.concat page nextPage
+            |> List.dropFirst indexWithinPage
+        Stdout.line! (Inspect.toStr { queryInput, indexWithinPage })
+
         Task.ok {
             limit: queryInput.limit,
             offset: queryInput.offset,

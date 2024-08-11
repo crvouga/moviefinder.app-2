@@ -4,6 +4,7 @@ module [
     fromIndexAndLimit,
     fromPageBased,
     toPageBased,
+    toIndexWithinPage,
 ]
 
 Pagination : {
@@ -33,3 +34,7 @@ fromIndexAndLimit = \{ index, limit } -> {
     limit,
     offset: ((index - 1) // limit) * limit,
 }
+
+toIndexWithinPage : U64, Pagination -> U64
+toIndexWithinPage = \pageSize, pagination ->
+    pagination.offset % pageSize + 1
