@@ -22,5 +22,5 @@ docker build --platform linux/amd64 -t moviefinder-app .
 ## Run Docker
 
 ```sh
-docker run --platform linux/amd64 --rm moviefinder-app
+export $(grep -v '^#' .env | xargs) && docker run --platform linux/amd64 --rm -e DATABASE_URL="$DATABASE_URL" moviefinder-app
 ```
