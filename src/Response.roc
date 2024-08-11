@@ -5,6 +5,7 @@ module [
     Response,
     toHttp,
     hxTrigger,
+    staticHtml,
 ]
 
 import pf.Http
@@ -14,6 +15,7 @@ import Url
 
 ResponseVariant : [
     Html Html.Node,
+    StaticHtml Html.Node,
     Text Str,
     Redirect Route.Route,
 ]
@@ -30,6 +32,9 @@ hxTrigger = \res, trigger -> { res & hxTrigger: Just trigger }
 
 html : Html.Node -> Response
 html = \node -> { variant: Html node, hxTrigger: Missing }
+
+staticHtml : Html.Node -> Response
+staticHtml = \node -> { variant: StaticHtml node, hxTrigger: Missing }
 
 text : Str -> Response
 text = \str -> { variant: Text str, hxTrigger: Missing }
@@ -61,6 +66,17 @@ toHttp = \res ->
                 status: 200,
                 headers: [
                     httpHeader "Content-Type" "text/html; charset=utf-8",
+                ]
+                |> appendHxTrigger res.hxTrigger,
+                body: node |> Html.render |> Str.toUtf8,
+            }
+
+        StaticHtml node ->
+            {
+                status: 200,
+                headers: [
+                    httpHeader "Content-Type" "text/html; charset=utf-8",
+                    # httpHeader "Cache-Control" "public, max-age=31536000, immutable",
                 ]
                 |> appendHxTrigger res.hxTrigger,
                 body: node |> Html.render |> Str.toUtf8,
