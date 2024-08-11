@@ -13,7 +13,7 @@ import MediaId
 import MediaVideo
 import Url
 import json.OptionOrNull exposing [OptionOrNull]
-import pf.Stdout
+# import pf.Stdout
 
 Config : {
     tmdbApiReadAccessToken : Str,
@@ -77,8 +77,7 @@ getDiscoverMovie = \config, mediaQuery ->
         decoded = Json.decode (Str.toUtf8 res)
 
         when decoded is
-            Err err ->
-                Stdout.line! (Inspect.toStr { err, res })
+            Err _ ->
                 Task.ok []
 
             Ok parsed ->
@@ -90,7 +89,6 @@ getDiscoverMovie = \config, mediaQuery ->
                     |> Result.withDefault []
                     |> List.keepOks OptionOrNull.getResult
                     |> List.map \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
-                Stdout.line! (Inspect.toStr { parsed, mediaList: List.len mediaList, req, pageBased, res })
 
                 Task.ok mediaList
 
@@ -131,7 +129,6 @@ find = \config -> \queryInput ->
         rows =
             List.concat page nextPage
             |> List.dropFirst indexWithinPage
-        Stdout.line! (Inspect.toStr { queryInput, indexWithinPage, rows: List.len rows, page: List.len page, nextPage: List.len nextPage })
 
         Task.ok {
             limit: queryInput.limit,

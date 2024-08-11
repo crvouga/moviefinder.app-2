@@ -1,8 +1,8 @@
 module [Route, encode, decode]
 import Url exposing [Url]
-import Feed.Form.Route
+import Feed.Controls.Route
 
-Route : [Feed, FeedItemsLoad { limit : U64, offset : U64 }, Form Feed.Form.Route.Route, ChangedSlide { index : U64 }, Unknown]
+Route : [Feed, FeedItemsLoad { limit : U64, offset : U64 }, Controls Feed.Controls.Route.Route, ChangedSlide { index : U64 }, Unknown]
 
 encode : Route -> Url
 encode = \route ->
@@ -17,8 +17,8 @@ encode = \route ->
         ChangedSlide payload ->
             "/feed/changed-slide" |> Url.fromStr |> Url.appendParam "index" (Num.toStr payload.index)
 
-        Form r ->
-            Feed.Form.Route.encode r
+        Controls r ->
+            Feed.Controls.Route.encode r
 
         Unknown ->
             Url.fromStr "/"

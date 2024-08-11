@@ -1,19 +1,19 @@
 module [Route, encode, decode]
 import Url exposing [Url]
 
-Route : [Form, FormLoad, Unknown]
+Route : [Controls, ControlsLoad, Unknown]
 
 encode : Route -> Url
 encode = \route ->
     when route is
-        Form -> "/feed-form" |> Url.fromStr
-        FormLoad -> "/feed-form/load" |> Url.fromStr
+        Controls -> "/feed-controls" |> Url.fromStr
+        ControlsLoad -> "/feed-controls/load" |> Url.fromStr
         Unknown -> Url.fromStr "/"
 
 decode : Url -> Route
 decode = \url ->
     when Url.path url is
-        "/feed-form" -> Form
-        "/feed-form/load" -> FormLoad
+        "/feed-controls" -> Controls
+        "/feed-controls/load" -> ControlsLoad
         _ -> Unknown
 

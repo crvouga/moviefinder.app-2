@@ -4,16 +4,16 @@ module [
 
 import Response
 import pf.Task
-import Feed.Form.Route
+import Feed.Controls.Route
 import Ctx
 
-routeHx : Ctx.Ctx, Feed.Form.Route.Route -> Task.Task Response.Response _
+routeHx : Ctx.Ctx, Feed.Controls.Route.Route -> Task.Task Response.Response _
 routeHx = \_ctx, route ->
     when route is
-        Form ->
+        Controls ->
             Response.redirect (Feed Feed) |> Task.ok
 
-        FormLoad ->
+        ControlsLoad ->
             Response.redirect (Feed Feed) |> Task.ok
 
         Unknown ->

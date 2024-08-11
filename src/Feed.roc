@@ -18,8 +18,10 @@ import Ui.Swiper
 import Ui.Image
 import App.Link
 import Logger
+import Ui.Icon
+import Ui.IconButton
 import Url
-import Feed.Form
+import Feed.Controls
 import Feed.Feed exposing [Feed]
 # import pf.Sleep
 # import Pagination
@@ -78,8 +80,8 @@ routeHx = \ctx, route ->
             |> Response.html
             |> Task.ok
 
-        Form r ->
-            Feed.Form.routeHx ctx r
+        Controls r ->
+            Feed.Controls.routeHx ctx r
 
         ChangedSlide payload ->
             got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
@@ -108,7 +110,7 @@ viewChip : Str -> Html.Node
 viewChip = \text ->
     Html.div
         [
-            Attr.class "flex items-center justify-center px-2 py-1 bg-gray-200 rounded-full",
+            Attr.class "flex items-center justify-center px-3 py-1 bg-gray-200 rounded-full w-fit",
         ]
         [
             Html.span
@@ -136,7 +138,7 @@ jsWatchSlideChange =
         const endpointTemplate = '$(changeSlideEndpoint)'
         const endpoint = endpointTemplate.replace('0', feedIndex)
         htmx.ajax('POST', endpoint, { swap: 'none' })
-        window.history.pushState({}, '', '/feed?activeIndex=' + feedIndex)
+        window.history.pushState({}, '', `/feed?activeIndex=${feedIndex}`)
     })
     """
 
@@ -152,10 +154,16 @@ viewFeed =
                     Attr.class "w-full h-16 flex items-center justify-start px-4 border-b overflow-hidden",
                 ]
                 [
-                    viewChip "Popular",
-                    # Ui.iconButton [] [
-                    #     Ui.Icon.
-                    # ],
+                    Html.div
+                        [
+                            Attr.class "flex-1 items-center",
+                        ]
+                        [
+                            viewChip "Popular",
+                        ],
+                    Ui.IconButton.view {
+                        icon: Ui.Icon.adjustmentsHorizontal {},
+                    },
                 ],
             Html.script [] [Html.dangerouslyIncludeUnescapedHtml jsWatchSlideChange],
             Html.div [Attr.class "w-full flex-1 overflow-hidden"] [
