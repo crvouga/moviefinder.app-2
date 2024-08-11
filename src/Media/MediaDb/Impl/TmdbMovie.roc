@@ -12,6 +12,7 @@ import ImageSet
 import MediaId
 import MediaVideo
 import Url
+import json.OptionOrNull exposing [OptionOrNull]
 import pf.Stdout
 
 Config : {
@@ -20,36 +21,36 @@ Config : {
 }
 
 TmdbDiscoverMovieResult : {
-    adult : Bool,
-    backdropPath : Str,
-    genreIds : List I32,
-    id : I32,
-    originalLanguage : Str,
-    originalTitle : Str,
-    overview : Str,
-    popularity : F32,
-    posterPath : Str,
-    releaseDate : Str,
-    title : Str,
-    video : Bool,
-    voteAverage : F32,
-    voteCount : I32,
+    adult : OptionOrNull Bool,
+    backdropPath : OptionOrNull Str,
+    genreIds : OptionOrNull (List U64),
+    id : OptionOrNull U64,
+    originalLanguage : OptionOrNull Str,
+    originalTitle : OptionOrNull Str,
+    overview : OptionOrNull Str,
+    popularity : OptionOrNull F32,
+    posterPath : OptionOrNull Str,
+    releaseDate : OptionOrNull Str,
+    title : OptionOrNull Str,
+    video : OptionOrNull Bool,
+    voteAverage : OptionOrNull F32,
+    voteCount : OptionOrNull U64,
 }
 
 TmdbDiscoverMovieResponse : {
-    page : I32,
-    totalPages : I32,
-    totalResults : I32,
-    results : List TmdbDiscoverMovieResult,
+    page : OptionOrNull U64,
+    totalPages : OptionOrNull U64,
+    totalResults : OptionOrNull U64,
+    results : OptionOrNull (List (OptionOrNull TmdbDiscoverMovieResult)),
 }
 
-emptyResult : TmdbDiscoverMovieResponse
-emptyResult = {
-    page: 0,
-    totalPages: 0,
-    totalResults: 0,
-    results: [],
-}
+# emptyResult : TmdbDiscoverMovieResponse
+# emptyResult = {
+#     page: 0,
+#     totalPages: 0,
+#     totalResults: 0,
+#     results: [],
+# }
 
 pageSize = 20
 
@@ -60,24 +61,38 @@ getDiscoverMovie = \config, mediaQuery ->
             limit: mediaQuery.limit,
             offset: mediaQuery.offset,
         }
-        #
-        url =
+
+        req =
             # https://developer.themoviedb.org/reference/discover-movie
             "/discover/movie"
             |> Url.fromStr
             |> Url.appendParam "page" (pageBased.page |> Num.toStr)
+            |> Url.appendParam "include_adult" "false"
             |> Url.toStr
+            |> \url -> Tmdb.toRequest config url
 
-        response = Http.send! (Tmdb.toRequest config url)
-        discoverMovieResult = Json.decodeWithFallback (Str.toUtf8 response) emptyResult
+        res = Http.send! req
 
-        tmdbConfig = Tmdb.getTmdbConfig! config
+        decoded : Result TmdbDiscoverMovieResponse _
+        decoded = Json.decode (Str.toUtf8 res)
 
-        mediaList =
-            discoverMovieResult.results
-            |> List.map \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
+        when decoded is
+            Err err ->
+                Stdout.line! (Inspect.toStr { err, res })
+                Task.ok []
 
-        Task.ok mediaList
+            Ok parsed ->
+                tmdbConfig = Tmdb.getTmdbConfig! config
+
+                mediaList =
+                    parsed.results
+                    |> OptionOrNull.getResult
+                    |> Result.withDefault []
+                    |> List.keepOks OptionOrNull.getResult
+                    |> List.map \tmdbMovie -> tmdbMovieToMedia tmdbConfig tmdbMovie
+                Stdout.line! (Inspect.toStr { parsed, mediaList: List.len mediaList, req, pageBased, res })
+
+                Task.ok mediaList
 
     task |> Task.onErr (\_ -> Task.ok [])
 
@@ -95,12 +110,12 @@ toBackdropImageSet = \tmdbConfig, backdropPath ->
 
 tmdbMovieToMedia : Tmdb.TmdbConfig, TmdbDiscoverMovieResult -> Media
 tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
-    mediaId: tmdbMovie.id |> Num.toStr |> MediaId.fromStr,
-    mediaTitle: tmdbMovie.title,
-    mediaDescription: tmdbMovie.overview,
+    mediaId: tmdbMovie.id |> OptionOrNull.getResult |> Result.withDefault 0 |> Num.toStr |> MediaId.fromStr,
+    mediaTitle: tmdbMovie.title |> OptionOrNull.getResult |> Result.withDefault "",
+    mediaDescription: tmdbMovie.overview |> OptionOrNull.getResult |> Result.withDefault "",
     mediaType: Movie,
-    mediaPoster: toPosterImageSet tmdbConfig tmdbMovie.posterPath,
-    mediaBackdrop: toBackdropImageSet tmdbConfig tmdbMovie.backdropPath,
+    mediaPoster: tmdbMovie.posterPath |> OptionOrNull.getResult |> Result.withDefault "" |> \path -> toPosterImageSet tmdbConfig path,
+    mediaBackdrop: tmdbMovie.backdropPath |> OptionOrNull.getResult |> Result.withDefault "" |> \path -> toBackdropImageSet tmdbConfig path,
     mediaVideos: [],
 }
 
@@ -116,7 +131,7 @@ find = \config -> \queryInput ->
         rows =
             List.concat page nextPage
             |> List.dropFirst indexWithinPage
-        Stdout.line! (Inspect.toStr { queryInput, indexWithinPage })
+        Stdout.line! (Inspect.toStr { queryInput, indexWithinPage, rows: List.len rows, page: List.len page, nextPage: List.len nextPage })
 
         Task.ok {
             limit: queryInput.limit,
@@ -216,16 +231,17 @@ tmdbMovieDetailsToMedia = \tmdbConfig, tmdbMovieDetails -> {
 getMovieDetails : Config, MediaId.MediaId -> Task Media [NotFound]
 getMovieDetails = \config, mediaId ->
     task =
-        url =
+        req =
             # https://developer.themoviedb.org/reference/movie-details
             "/movie/$(mediaId)"
             |> Url.fromStr
             |> Url.appendParam "append_to_response" "videos"
             |> Url.toStr
+            |> \url -> Tmdb.toRequest config url
 
-        response = Http.send! (Tmdb.toRequest config url)
+        res = Http.send! req
 
-        decoded = Json.decode (Str.toUtf8 response)
+        decoded = Json.decode (Str.toUtf8 res)
 
         when decoded is
             Ok movieDetails ->

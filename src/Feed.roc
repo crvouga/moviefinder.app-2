@@ -48,11 +48,11 @@ routeHx = \ctx, route ->
             viewFeed |> Response.html |> Task.ok
 
         FeedItemsLoad mediaQuery ->
-            got <- ctx.feedDb.get "feed" |> Task.attempt
+            got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
 
             fallback : Feed
             fallback = {
-                feedId: "feed",
+                feedId: "some-feed-id",
                 activeIndex: 0,
             }
 
@@ -82,17 +82,16 @@ routeHx = \ctx, route ->
             Feed.Form.routeHx ctx r
 
         ChangedSlide payload ->
-            got <- ctx.feedDb.get "feed" |> Task.attempt
+            got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
 
             fallback : Feed
             fallback = {
-                feedId: "feed",
+                feedId: "some-feed-id",
                 activeIndex: payload.index - 1,
             }
 
             feed = got |> Result.withDefault fallback
 
-            feedNext : Feed
             feedNext = { feed & activeIndex: payload.index }
             Logger.info! ctx.logger (Inspect.toStr got)
 
@@ -100,7 +99,7 @@ routeHx = \ctx, route ->
 
             Logger.info! ctx.logger (Inspect.toStr put)
 
-            Html.fragment [] |> Response.html |> Task.ok
+            Response.nothing |> Task.ok
 
         Unknown ->
             Response.redirect (Feed Feed) |> Task.ok

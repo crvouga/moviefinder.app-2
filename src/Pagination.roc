@@ -15,6 +15,7 @@ Pagination : {
 PageBased : {
     page : U64,
     pageSize : U64,
+    index : U64,
 }
 
 fromPageBased : PageBased -> Pagination
@@ -27,6 +28,7 @@ toPageBased : U64, Pagination -> PageBased
 toPageBased = \pageSize, pagination -> {
     pageSize,
     page: (pagination.offset // pageSize) + 1,
+    index: (pagination.offset % pageSize) + 1,
 }
 
 fromIndexAndLimit : { index : U64, limit : U64 } -> Pagination
@@ -37,4 +39,5 @@ fromIndexAndLimit = \{ index, limit } -> {
 
 toIndexWithinPage : U64, Pagination -> U64
 toIndexWithinPage = \pageSize, pagination ->
-    pagination.offset % pageSize + 1
+    (toPageBased pageSize pagination) |> \{ index } -> index
+

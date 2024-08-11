@@ -2,6 +2,7 @@ module [
     html,
     redirect,
     text,
+    nothing,
     Response,
     toHttp,
     hxTrigger,
@@ -18,6 +19,7 @@ ResponseVariant : [
     StaticHtml Html.Node,
     Text Str,
     Redirect Route.Route,
+    Nothing,
 ]
 
 HxTrigger : [Just Str, Missing]
@@ -42,6 +44,9 @@ text = \str -> { variant: Text str, hxTrigger: Missing }
 redirect : Route.Route -> Response
 redirect = \route -> { variant: Redirect route, hxTrigger: Missing }
 
+nothing : Response
+nothing = { variant: Nothing, hxTrigger: Missing }
+
 httpHeader : Str, Str -> Http.Header
 httpHeader = \name, value -> {
     name,
@@ -61,6 +66,13 @@ appendHxTrigger = \headers, trigger ->
 toHttp : Response -> Http.Response
 toHttp = \res ->
     when res.variant is
+        Nothing ->
+            {
+                status: 200,
+                headers: [],
+                body: [],
+            }
+
         Html node ->
             {
                 status: 200,
