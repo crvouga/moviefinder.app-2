@@ -1,4 +1,4 @@
-# Builder stage using the roclang/nightly-ubuntu-latest image
+# Builder state using the roclang/nightly-ubuntu-latest image
 FROM roclang/nightly-debian-bookworm as builder
 
 # Copy the source code
@@ -16,9 +16,6 @@ FROM bitnami/minideb:bookworm as final
 # Set environment variables
 ENV ROC_BASIC_WEBSERVER_HOST=0.0.0.0
 ENV ROC_BASIC_WEBSERVER_PORT=8000
-
-# Install SQLite3
-RUN install_packages sqlite3 libsqlite3-0
 
 # Copy the binary from the builder container
 COPY --from=builder /src/Main .
