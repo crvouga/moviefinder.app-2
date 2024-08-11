@@ -1,4 +1,4 @@
-module [container, slide, direction, slidesPerView, speed]
+module [container, slide, direction, slidesPerView, speed, initialSlide]
 
 import Html
 import Html.Attr as Attr
@@ -23,3 +23,6 @@ direction = \directionValue -> (Attr.attribute "direction") (directionToStr dire
 
 speed : U64 -> Attr.Attribute
 speed = \speedValue -> (Attr.attribute "speed") (Num.toStr speedValue)
+
+initialSlide : U64 -> Attr.Attribute
+initialSlide = \initialSlideValue -> (Attr.attribute "initial-slide") (Num.toStr initialSlideValue)

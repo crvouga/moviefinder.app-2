@@ -118,6 +118,9 @@ viewChip = \text ->
                 [Html.text text],
         ]
 
+changeSlideEndpoint : Str
+changeSlideEndpoint = (ChangedSlide { index: 0 }) |> Feed.Route.encode |> Url.toStr
+
 jsWatchSlideChange : Str
 jsWatchSlideChange =
     """
@@ -130,9 +133,10 @@ jsWatchSlideChange =
         if(typeof feedIndex !== 'number' || Number.isNaN(feedIndex)) {
             return
         }
-        const endpointTemplate = '$((ChangedSlide { index: 0 }) |> Feed.Route.encode |> Url.toStr)'
+        const endpointTemplate = '$(changeSlideEndpoint)'
         const endpoint = endpointTemplate.replace('0', feedIndex)
         htmx.ajax('POST', endpoint, { swap: 'none' })
+        window.history.pushState({}, '', '/feed?activeIndex=' + feedIndex)
     })
     """
 
