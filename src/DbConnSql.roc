@@ -1,4 +1,3 @@
 module [DbConnSql]
 
-DbConnSql : {
-}
+DbConnSql : {}

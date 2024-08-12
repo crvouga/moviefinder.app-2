@@ -10,13 +10,14 @@ import Request
 
 logger = Logger.init ["app"]
 
-Config : {
-    tmdbApiReadAccessToken : Str,
-    databaseUrl : Str,
-}
-
-init : Config, Request.Request -> Ctx.Ctx
-init = \config, req -> {
+init :
+    {
+        tmdbApiReadAccessToken : Str,
+        databaseUrl : Str,
+        req : Request.Request,
+    }*
+    -> Ctx.Ctx
+init = \config -> {
     keyValueStore: KeyValueStore.Impl.init (Sqlite { databaseUrl: config.databaseUrl, logger: Logger.init ["key-value-store", "sqlite"] }),
     feedDb: Feed.FeedDb.Impl.init
         (
@@ -39,5 +40,5 @@ init = \config, req -> {
             }
         ),
     logger,
-    req,
+    req: config.req,
 }

@@ -1,4 +1,4 @@
-module [Request, fromHttp]
+module [Request, fromHttp, toCookies]
 
 import Route
 import pf.Http
@@ -7,6 +7,7 @@ import Url
 Request : {
     route : Route.Route,
     formData : Dict Str Str,
+    cookies : Dict Str Str,
 }
 
 toContentType : Http.Request -> Str
@@ -41,8 +42,27 @@ toFormData = \httpReq ->
         "application/x-www-form-urlencoded" -> httpReq.body |> Str.fromUtf8 |> Result.withDefault "" |> parseFormUrlEncoded
         _ -> Dict.empty {}
 
+toCookies : Http.Request -> Dict Str Str
+toCookies = \httpReq ->
+    httpReq
+    |> .headers
+    |> List.findFirst (\header -> header.name == "cookie")
+    |> Result.try (\header -> Str.fromUtf8 header.value)
+    |> Result.withDefault ""
+    |> Str.split "; "
+    |> List.map (\cookie -> cookie |> Str.split "=")
+    |> List.map
+        (\entry ->
+            when entry is
+                [key, value] -> (key, value)
+                _ -> ("", "")
+        )
+    |> List.dropIf (\(key, _) -> key == "")
+    |> Dict.fromList
+
 fromHttp : Http.Request -> Request
 fromHttp = \httpReq -> {
     route: httpReq.url |> Url.fromStr |> Route.decode,
     formData: toFormData httpReq,
+    cookies: Dict.empty {},
 }

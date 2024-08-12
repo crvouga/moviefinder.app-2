@@ -26,7 +26,7 @@ main = \httpReq ->
 
     req = Request.fromHttp httpReq
 
-    ctx = Ctx.Impl.init { tmdbApiReadAccessToken, databaseUrl } req
+    ctx = Ctx.Impl.init { tmdbApiReadAccessToken, databaseUrl, req }
     Logger.info! ctx.logger (Inspect.toStr req)
 
     res =
@@ -77,5 +77,6 @@ routeReq = \req ->
 
             App.Document.view { route }
             |> Response.html
+            |> Response.setCookie "session" "123"
             |> Task.ok
 

@@ -2,7 +2,13 @@ module [Route, encode, decode]
 import Url exposing [Url]
 import Feed.Controls.Route
 
-Route : [Feed, FeedItemsLoad { limit : U64, offset : U64 }, Controls Feed.Controls.Route.Route, ChangedSlide { index : U64 }, Unknown]
+Route : [
+    Feed,
+    FeedItemsLoad { limit : U64, offset : U64 },
+    Controls Feed.Controls.Route.Route,
+    ChangedSlide { index : U64 },
+    Unknown,
+]
 
 encode : Route -> Url
 encode = \route ->

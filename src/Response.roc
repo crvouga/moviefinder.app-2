@@ -4,6 +4,7 @@ module [
     text,
     nothing,
     Response,
+    setCookie,
     toHttp,
     hxTrigger,
     staticHtml,
@@ -27,25 +28,26 @@ HxTrigger : [Just Str, Missing]
 Response : {
     variant : ResponseVariant,
     hxTrigger : HxTrigger,
+    cookies : List { key : Str, value : Str },
 }
 
 hxTrigger : Response, Str -> Response
 hxTrigger = \res, trigger -> { res & hxTrigger: Just trigger }
 
 html : Html.Node -> Response
-html = \node -> { variant: Html node, hxTrigger: Missing }
+html = \node -> { variant: Html node, hxTrigger: Missing, cookies: [] }
 
 staticHtml : Html.Node -> Response
-staticHtml = \node -> { variant: StaticHtml node, hxTrigger: Missing }
+staticHtml = \node -> { variant: StaticHtml node, hxTrigger: Missing, cookies: [] }
 
 text : Str -> Response
-text = \str -> { variant: Text str, hxTrigger: Missing }
+text = \str -> { variant: Text str, hxTrigger: Missing, cookies: [] }
 
 redirect : Route.Route -> Response
-redirect = \route -> { variant: Redirect route, hxTrigger: Missing }
+redirect = \route -> { variant: Redirect route, hxTrigger: Missing, cookies: [] }
 
 nothing : Response
-nothing = { variant: Nothing, hxTrigger: Missing }
+nothing = { variant: Nothing, hxTrigger: Missing, cookies: [] }
 
 httpHeader : Str, Str -> Http.Header
 httpHeader = \name, value -> {
@@ -63,6 +65,15 @@ appendHxTrigger = \headers, trigger ->
         Missing ->
             headers
 
+setCookie : Response, Str, Str -> Response
+setCookie = \res, name, value -> { res & cookies: List.append res.cookies { key: name, value } }
+
+appendSetCookie : List Http.Header, List { key : Str, value : Str } -> List Http.Header
+appendSetCookie = \headers, cookies ->
+    cookies
+    |> List.map \{ key, value } -> httpHeader "Set-Cookie" ("$(key)=$(value); Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000;")
+    |> List.concat headers
+
 toHttp : Response -> Http.Response
 toHttp = \res ->
     when res.variant is
@@ -79,7 +90,8 @@ toHttp = \res ->
                 headers: [
                     httpHeader "Content-Type" "text/html; charset=utf-8",
                 ]
-                |> appendHxTrigger res.hxTrigger,
+                |> appendHxTrigger res.hxTrigger
+                |> appendSetCookie res.cookies,
                 body: node |> Html.render |> Str.toUtf8,
             }
 
@@ -88,9 +100,9 @@ toHttp = \res ->
                 status: 200,
                 headers: [
                     httpHeader "Content-Type" "text/html; charset=utf-8",
-                    # httpHeader "Cache-Control" "public, max-age=31536000, immutable",
                 ]
-                |> appendHxTrigger res.hxTrigger,
+                |> appendHxTrigger res.hxTrigger
+                |> appendSetCookie res.cookies,
                 body: node |> Html.render |> Str.toUtf8,
             }
 
@@ -101,7 +113,8 @@ toHttp = \res ->
                     httpHeader "Content-Type" "text/plain; charset=utf-8",
 
                 ]
-                |> appendHxTrigger res.hxTrigger,
+                |> appendHxTrigger res.hxTrigger
+                |> appendSetCookie res.cookies,
                 body: Str.toUtf8 body,
             }
 
@@ -113,6 +126,7 @@ toHttp = \res ->
                     httpHeader "Location" (Url.toStr url),
                     httpHeader "Hx-Push-Url" (Url.toStr url),
                 ]
-                |> appendHxTrigger res.hxTrigger,
+                |> appendHxTrigger res.hxTrigger
+                |> appendSetCookie res.cookies,
                 body: Str.toUtf8 "",
             }
