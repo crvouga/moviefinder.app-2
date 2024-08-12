@@ -77,6 +77,5 @@ routeReq = \req ->
 
             App.Document.view { route }
             |> Response.html
-            |> Response.setCookie "session" "123"
             |> Task.ok
 
