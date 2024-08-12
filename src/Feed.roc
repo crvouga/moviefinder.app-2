@@ -1,5 +1,6 @@
 module [
     routeHx,
+    viewLoadPrev,
 ]
 
 import Html
@@ -27,15 +28,6 @@ import Feed.Feed exposing [Feed]
 # import Pagination
 # import X
 
-defaultMediaQuery : {
-    limit : U64,
-    offset : U64,
-}
-defaultMediaQuery = {
-    limit: 5,
-    offset: 0,
-}
-
 FeedItem : {
     index : U64,
     media : Media.Media,
@@ -49,7 +41,7 @@ routeHx = \ctx, route ->
         Feed ->
             viewFeed |> Response.html |> Task.ok
 
-        FeedItemsLoad mediaQuery ->
+        LoadNext ->
             got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
 
             fallback : Feed
@@ -76,7 +68,38 @@ routeHx = \ctx, route ->
                 |> List.mapWithIndex (\media, indexWithinPage -> { media, index: indexWithinPage + feed.activeIndex })
 
             feedItems
-            |> viewFeedItems mediaQuery
+            |> viewFeedItems
+            |> Response.html
+            |> Task.ok
+
+        LoadPrev ->
+            got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
+
+            fallback : Feed
+            fallback = {
+                feedId: "some-feed-id",
+                activeIndex: 0,
+            }
+
+            feed = got |> Result.withDefault fallback
+            #
+            Logger.info! ctx.logger (Inspect.toStr feed)
+
+            queried =
+                ctx.mediaDb.find! {
+                    limit,
+                    offset: feed.activeIndex,
+                    orderBy: Desc MediaId,
+                    where: And [],
+                }
+            Logger.info! ctx.logger (Inspect.toStr feed)
+
+            feedItems =
+                queried.rows
+                |> List.mapWithIndex (\media, indexWithinPage -> { media, index: indexWithinPage + feed.activeIndex })
+
+            feedItems
+            |> viewFeedItems
             |> Response.html
             |> Task.ok
 
@@ -180,7 +203,7 @@ viewFeed =
                                 Attr.class "flex items-center justify-center w-full h-full",
                                 Hx.swap OuterHtml,
                                 Hx.trigger Load,
-                                Hx.get (Feed.Route.encode (FeedItemsLoad defaultMediaQuery)),
+                                Hx.get (Feed.Route.encode LoadNext),
 
                             ]
                             [
@@ -191,18 +214,20 @@ viewFeed =
             App.BottomNavigation.view Home,
         ]
 
-viewFeedItems : List FeedItem, { limit : U64, offset : U64 } -> Html.Node
-viewFeedItems = \feedItems, mediaQuery ->
+viewFeedItems : List FeedItem -> Html.Node
+viewFeedItems = \feedItems ->
     Html.fragment
         (
-            List.concat
-                (List.map feedItems viewFeedItem)
+            []
+            |> List.concat (List.map feedItems viewFeedItem)
+            |> List.concat
                 (
                     if (List.len feedItems) > 0 then
-                        [viewFeedItemLoadMore mediaQuery]
+                        [viewLoadNext]
                     else
                         []
                 )
+
         )
 
 viewFeedItem : FeedItem -> Html.Node
@@ -226,14 +251,27 @@ viewFeedItem = \feedItem ->
                 ],
         ]
 
-viewFeedItemLoadMore : { limit : U64, offset : U64 } -> Html.Node
-viewFeedItemLoadMore = \mediaQuery ->
+viewLoadPrev : Html.Node
+viewLoadPrev =
     Ui.Swiper.slide
         [
             Attr.class "w-full h-full flex items-center justify-center",
             Hx.swap OuterHtml,
             Hx.trigger Intersect,
-            Hx.get (Feed.Route.encode (FeedItemsLoad { mediaQuery & offset: mediaQuery.offset + mediaQuery.limit })),
+            Hx.get (Feed.Route.encode LoadPrev),
+        ]
+        [
+            Ui.Spinner.view {},
+        ]
+
+viewLoadNext : Html.Node
+viewLoadNext =
+    Ui.Swiper.slide
+        [
+            Attr.class "w-full h-full flex items-center justify-center",
+            Hx.swap OuterHtml,
+            Hx.trigger Intersect,
+            Hx.get (Feed.Route.encode LoadNext),
         ]
         [
             Ui.Spinner.view {},

@@ -4,7 +4,8 @@ import Feed.Controls.Route
 
 Route : [
     Feed,
-    FeedItemsLoad { limit : U64, offset : U64 },
+    LoadNext,
+    LoadPrev,
     Controls Feed.Controls.Route.Route,
     ChangedSlide { index : U64 },
     Unknown,
@@ -16,9 +17,11 @@ encode = \route ->
         Feed ->
             "/feed" |> Url.fromStr
 
-        FeedItemsLoad _ ->
-            "/feed/feed-items-load"
-            |> Url.fromStr
+        LoadNext ->
+            "/feed/load-next" |> Url.fromStr
+
+        LoadPrev ->
+            "/feed/load-prev" |> Url.fromStr
 
         ChangedSlide payload ->
             "/feed/changed-slide" |> Url.fromStr |> Url.appendParam "index" (Num.toStr payload.index)
@@ -35,13 +38,11 @@ decode = \url ->
         "/feed" ->
             Feed
 
-        "/feed/feed-items-load" ->
-            queryParams = Url.queryParams url
-            limitStr = queryParams |> Dict.get "limit" |> Result.withDefault ""
-            offsetStr = queryParams |> Dict.get "offset" |> Result.withDefault ""
-            limit = limitStr |> Str.toU64 |> Result.withDefault 10
-            offset = offsetStr |> Str.toU64 |> Result.withDefault 0
-            FeedItemsLoad { limit, offset }
+        "/feed/load-next" ->
+            LoadNext
+
+        "/feed/load-prev" ->
+            LoadPrev
 
         "/feed/changed-slide" ->
             queryParams = Url.queryParams url
