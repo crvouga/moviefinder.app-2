@@ -8,7 +8,7 @@ Route : [
     LoadPrev,
     Controls Feed.Controls.Route.Route,
     ChangedSlide { index : U64 },
-    Unknown,
+    Unknown Str,
 ]
 
 encode : Route -> Url
@@ -29,25 +29,30 @@ encode = \route ->
         Controls r ->
             Feed.Controls.Route.encode r
 
-        Unknown ->
-            Url.fromStr "/"
+        Unknown url ->
+            Url.fromStr url
 
 decode : Url -> Route
 decode = \url ->
-    when Url.path url is
-        "/feed" ->
+    when Url.toPaths url is
+        ["/feed"] ->
             Feed
 
-        "/feed/load-next" ->
+        ["/feed", "/load-next", ..] ->
             LoadNext
 
-        "/feed/load-prev" ->
+        ["/feed", "/load-prev", ..] ->
             LoadPrev
 
-        "/feed/changed-slide" ->
+        ["/feed", "/changed-slide", ..] ->
             queryParams = Url.queryParams url
             index = queryParams |> Dict.get "index" |> Result.try Str.toU64 |> Result.withDefault 0
             ChangedSlide { index }
 
+        ["/feed", "/controls", ..] ->
+            Controls (Feed.Controls.Route.decode url)
+
         _ ->
-            Unknown
+            Unknown (Url.toStr url)
+
+expect ("/feed/controls" |> Url.fromStr |> decode) == (Controls Controls)

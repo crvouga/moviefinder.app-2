@@ -126,7 +126,8 @@ routeHx = \ctx, route ->
 
             Response.nothing |> Task.ok
 
-        Unknown ->
+        Unknown url ->
+            Logger.info! ctx.logger (Inspect.toStr (Url.toPaths (Url.fromStr url)))
             Response.redirect (Feed Feed) |> Task.ok
 
 viewChip : Str -> Html.Node
@@ -185,7 +186,10 @@ viewFeed =
                             viewChip "Popular",
                         ],
                     Ui.IconButton.view {
+                        # hxGet: Feed.Route.encode (Controls {}),
                         icon: Ui.Icon.adjustmentsHorizontal {},
+                        href: Feed.Route.encode (Controls Controls),
+                        target: "#app",
                     },
                 ],
             Html.script [] [Html.dangerouslyIncludeUnescapedHtml jsWatchSlideChange],

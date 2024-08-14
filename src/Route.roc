@@ -20,36 +20,27 @@ init = Feed Feed
 
 decode : Url -> Route
 decode = \url ->
-    head =
-        url
-        |> toPaths
-        |> List.first
-        |> \first -> Result.withDefault first "/"
-
-    when head is
-        "/login" ->
+    when Url.toPaths url is
+        ["/login", ..] ->
             Login (Auth.Login.Route.decode url)
 
-        "/feed" ->
+        ["/feed", ..] ->
             Feed (Feed.Route.decode url)
 
-        "/account" ->
+        ["/account", ..] ->
             Account (Account.Route.decode url)
 
-        "/media" ->
+        ["/media", ..] ->
             Media (Media.Details.Route.decode url)
 
-        "/robots.txt" ->
+        ["/robots.txt", ..] ->
             RobotsTxt
 
-        "/" ->
+        ["/", ..] ->
             Index
 
         _ ->
             Index
-
-# expect decode (Url.fromStr "/feed") == Feed Feed
-# expect decode (Url.fromStr "/login/verify-code") == Login VerifyCode
 
 encode : Route -> Url
 encode = \route ->
@@ -71,13 +62,3 @@ encode = \route ->
 
         Index ->
             Url.fromStr "/"
-
-toPaths : Url -> List Str
-toPaths = \url ->
-    Url.toStr url
-    |> Str.split "/"
-    |> List.keepIf (\s -> s |> Str.isEmpty |> Bool.not)
-    |> List.map (\s -> s |> Str.withPrefix "/")
-
-# expect (toPaths (Url.fromStr "/auth")) == ["/auth"]
-# expect (toPaths (Url.fromStr "/auth/login/verify")) == ["/auth", "/login", "/verify"]

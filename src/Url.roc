@@ -1,4 +1,4 @@
-module [Url, fromStr, toStr, path, appendParam, queryParams]
+module [Url, fromStr, toStr, path, appendParam, queryParams, toPaths]
 
 import pf.Url as UrlLib
 
@@ -18,3 +18,15 @@ appendParam = \@Url url, key, value -> @Url (UrlLib.appendParam url key value)
 
 queryParams : Url -> Dict Str Str
 queryParams = \@Url url -> UrlLib.queryParams url
+
+toPaths : Url -> List Str
+toPaths = \url ->
+    Url.toStr url
+    |> Str.split "?"
+    |> List.first
+    |> Result.withDefault ""
+    |> Str.split "/"
+    |> List.keepIf (\s -> s |> Str.isEmpty |> Bool.not)
+    |> List.map (\s -> s |> Str.withPrefix "/")
+
+expect (toPaths (fromStr "/feed/change-slide")) == ["/feed", "/change-slide"]
