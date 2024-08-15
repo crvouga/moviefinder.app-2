@@ -185,8 +185,7 @@ viewFeed =
                         [
                             viewChip "Popular",
                         ],
-                    Ui.IconButton.view {
-                        # hxGet: Feed.Route.encode (Controls {}),
+                    Ui.IconButton.a {
                         icon: Ui.Icon.adjustmentsHorizontal {},
                         href: Feed.Route.encode (Controls Controls),
                         target: "#app",

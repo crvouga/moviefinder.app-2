@@ -6,11 +6,13 @@ import Logger
 import KeyValueStore
 import Request
 import Feed.FeedDb
+import Media.GenreDb
 
 Ctx : {
     verifySms : Auth.VerifySms.VerifySms,
     feedDb : Feed.FeedDb.FeedDb,
     mediaDb : Media.MediaDb.MediaDb,
+    genreDb : Media.GenreDb.GenreDb,
     logger : Logger.Logger,
     req : Request.Request,
     keyValueStore : KeyValueStore.KeyValueStore,

@@ -6,6 +6,7 @@ import Media.MediaDb.Impl
 import KeyValueStore.Impl
 import Logger
 import Feed.FeedDb.Impl
+import Media.GenreDb.Impl
 import Request
 
 logger = Logger.init ["app"]
@@ -30,6 +31,13 @@ init = \config -> {
             Fake {
                 code: "123",
                 logger: Logger.init ["verify-sms-fake"],
+            }
+        ),
+    genreDb: Media.GenreDb.Impl.init
+        (
+            Tmdb {
+                tmdbApiReadAccessToken: config.tmdbApiReadAccessToken,
+                logger: Logger.init ["genre-db"],
             }
         ),
     mediaDb: Media.MediaDb.Impl.init
