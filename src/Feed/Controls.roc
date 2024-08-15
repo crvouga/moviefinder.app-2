@@ -11,12 +11,18 @@ import Ctx
 import Ui.Icon
 import Html.Attr as Attr
 import Ui.IconButton
+import Media.Genre exposing [Genre]
+import pf.Task
 
 routeHx : Ctx.Ctx, Feed.Controls.Route.Route -> Task.Task Response.Response _
-routeHx = \_ctx, route ->
+routeHx = \ctx, route ->
     when route is
         Controls ->
-            viewControls |> Response.html |> Task.ok
+            allGenres <- ctx.genreDb.all {} |> Task.attempt
+
+            when allGenres is
+                Err _ -> viewControlsErr |> Response.html |> Task.ok
+                Ok genres -> viewControls genres |> Response.html |> Task.ok
 
         ControlsLoad ->
             Response.redirect (Feed Feed) |> Task.ok
@@ -24,30 +30,40 @@ routeHx = \_ctx, route ->
         Unknown ->
             Response.redirect (Feed Feed) |> Task.ok
 
-viewControls : Html.Node
-viewControls =
-    Html.div [] [
-        Html.div
-            [
-                Attr.class "w-full h-16 flex items-center justify-start overflow-hidden",
-            ]
-            [
-                Html.input [
-                    Attr.class "flex-1 items-center bg-transparent p-4",
-                    Attr.placeholder "Search Genre, Actor, Director, ...",
-                    Attr.disabled "true",
-                ],
-                Html.div
-                    [
-                        Attr.class "pr-4",
+viewTopBar : Html.Node
+viewTopBar =
+    Html.div
+        [
+            Attr.class "w-full h-16 flex items-center justify-start overflow-hidden",
+        ]
+        [
+            Html.div [] [],
+            Html.div
+                [
+                    Attr.class "pr-4",
 
-                    ]
-                    [
-                        Ui.IconButton.a {
-                            icon: Ui.Icon.xMark {},
-                            href: Feed.Route.encode (Feed),
-                            target: "#app",
-                        },
-                    ],
-            ],
+                ]
+                [
+                    Ui.IconButton.a {
+                        icon: Ui.Icon.xMark {},
+                        href: Feed.Route.encode (Feed),
+                        target: "#app",
+                    },
+                ],
+        ]
+
+viewControlsErr : Html.Node
+viewControlsErr =
+    Html.div [] [
+        viewTopBar,
+        Html.div [] [
+            Html.text "errored",
+        ],
+    ]
+
+viewControls : List Genre -> Html.Node
+viewControls = \genres ->
+    Html.div [] [
+        viewTopBar,
+        Html.fragment (List.map genres \genre -> Html.text genre.genreName),
     ]
