@@ -27,7 +27,11 @@ TmdbGenre : {
 
 tmdbGenreToGenre : TmdbGenre -> Result Genre [MissingData]
 tmdbGenreToGenre = \tmdbGenre ->
-    when { id: OptionOrNull.getResult tmdbGenre.id, name: OptionOrNull.getResult tmdbGenre.name } is
+    result = {
+        id: OptionOrNull.getResult tmdbGenre.id,
+        name: OptionOrNull.getResult tmdbGenre.name,
+    }
+    when result is
         { id: Ok id, name: Ok name } ->
             genre : Genre
             genre = { genreId: Num.toStr id, genreName: name }
