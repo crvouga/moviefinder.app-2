@@ -1,7 +1,8 @@
-module [baseUrl, toRequest, toBaseHeaders, TmdbConfig, getTmdbConfig, pageSize]
+module [baseUrl, toRequest, toBaseHeaders, TmdbConfig, getTmdbConfig, pageSize, toPosterImageSet, toBackdropImageSet]
 
 import pf.Task exposing [Task]
 import pf.Http
+import ImageSet exposing [ImageSet]
 import Json
 
 baseUrl : Str
@@ -74,3 +75,15 @@ getTmdbConfig = \config ->
         Task.ok tmdbConfig
 
     task |> Task.onErr (\_ -> Task.ok emptyTmdbConfig)
+
+toPosterImageSet : TmdbConfig, Str -> ImageSet
+toPosterImageSet = \tmdbConfig, posterPath ->
+    tmdbConfig.images.posterSizes
+    |> List.map \size -> [tmdbConfig.images.secureBaseUrl, size, posterPath] |> Str.joinWith ""
+    |> \lowestResFirst -> ImageSet.init { lowestResFirst }
+
+toBackdropImageSet : TmdbConfig, Str -> ImageSet
+toBackdropImageSet = \tmdbConfig, backdropPath ->
+    tmdbConfig.images.backdropSizes
+    |> List.map \size -> [tmdbConfig.images.secureBaseUrl, size, backdropPath] |> Str.joinWith ""
+    |> \lowestResFirst -> ImageSet.init { lowestResFirst }

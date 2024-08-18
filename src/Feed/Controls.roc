@@ -48,6 +48,7 @@ viewTopBar =
                         icon: Ui.Icon.xMark {},
                         href: Feed.Route.encode (Feed),
                         target: "#app",
+                        label: "Close",
                     },
                 ],
         ]

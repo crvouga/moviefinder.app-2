@@ -6,10 +6,10 @@ import Pagination
 import Media.MediaDb exposing [MediaDb, Find, FindById, MediaQuery]
 import Media exposing [Media]
 import Logger
-import Media.MediaDb.Impl.Tmdb as Tmdb
 import Json
 import ImageSet
 import MediaId
+import Tmdb
 import MediaVideo
 import Url
 import json.OptionOrNull exposing [OptionOrNull]
@@ -94,26 +94,14 @@ getDiscoverMovie = \config, mediaQuery ->
 
     task |> Task.onErr (\_ -> Task.ok [])
 
-toPosterImageSet : Tmdb.TmdbConfig, Str -> ImageSet.ImageSet
-toPosterImageSet = \tmdbConfig, posterPath ->
-    tmdbConfig.images.posterSizes
-    |> List.map \size -> [tmdbConfig.images.baseUrl, size, posterPath] |> Str.joinWith ""
-    |> \lowestResFirst -> ImageSet.init { lowestResFirst }
-
-toBackdropImageSet : Tmdb.TmdbConfig, Str -> ImageSet.ImageSet
-toBackdropImageSet = \tmdbConfig, backdropPath ->
-    tmdbConfig.images.backdropSizes
-    |> List.map \size -> [tmdbConfig.images.baseUrl, size, backdropPath] |> Str.joinWith ""
-    |> \lowestResFirst -> ImageSet.init { lowestResFirst }
-
 tmdbMovieToMedia : Tmdb.TmdbConfig, TmdbDiscoverMovieResult -> Media
 tmdbMovieToMedia = \tmdbConfig, tmdbMovie -> {
     mediaId: tmdbMovie.id |> OptionOrNull.getResult |> Result.withDefault 0 |> Num.toStr |> MediaId.fromStr,
     mediaTitle: tmdbMovie.title |> OptionOrNull.getResult |> Result.withDefault "",
     mediaDescription: tmdbMovie.overview |> OptionOrNull.getResult |> Result.withDefault "",
     mediaType: Movie,
-    mediaPoster: tmdbMovie.posterPath |> OptionOrNull.getResult |> Result.withDefault "" |> \path -> toPosterImageSet tmdbConfig path,
-    mediaBackdrop: tmdbMovie.backdropPath |> OptionOrNull.getResult |> Result.withDefault "" |> \path -> toBackdropImageSet tmdbConfig path,
+    mediaPoster: tmdbMovie.posterPath |> OptionOrNull.getResult |> Result.withDefault "" |> \path -> Tmdb.toPosterImageSet tmdbConfig path,
+    mediaBackdrop: tmdbMovie.backdropPath |> OptionOrNull.getResult |> Result.withDefault "" |> \path -> Tmdb.toBackdropImageSet tmdbConfig path,
     mediaVideos: [],
 }
 
@@ -220,8 +208,8 @@ tmdbMovieDetailsToMedia = \tmdbConfig, tmdbMovieDetails -> {
     mediaTitle: tmdbMovieDetails.title,
     mediaDescription: tmdbMovieDetails.overview,
     mediaType: Movie,
-    mediaPoster: toPosterImageSet tmdbConfig tmdbMovieDetails.posterPath,
-    mediaBackdrop: toBackdropImageSet tmdbConfig tmdbMovieDetails.backdropPath,
+    mediaPoster: Tmdb.toPosterImageSet tmdbConfig tmdbMovieDetails.posterPath,
+    mediaBackdrop: Tmdb.toBackdropImageSet tmdbConfig tmdbMovieDetails.backdropPath,
     mediaVideos: List.map tmdbMovieDetails.videos.results tmdbVideoToMediaVideo,
 }
 

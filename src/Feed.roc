@@ -189,6 +189,7 @@ viewFeed =
                         icon: Ui.Icon.adjustmentsHorizontal {},
                         href: Feed.Route.encode (Controls Controls),
                         target: "#app",
+                        label: "Controls",
                     },
                 ],
             Html.script [] [Html.dangerouslyIncludeUnescapedHtml jsWatchSlideChange],
@@ -242,10 +243,13 @@ viewFeedItem = \feedItem ->
         ]
         [
             App.Link.view
-                (Media (Details { mediaId: feedItem.media.mediaId, mediaType: feedItem.media.mediaType }))
-                [
-                    Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center",
-                ]
+                {
+                    route: Media (Details { mediaId: feedItem.media.mediaId, mediaType: feedItem.media.mediaType }),
+                    label: "View details",
+                    attrs: [
+                        Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center",
+                    ],
+                }
                 [
                     Ui.Image.view [
                         Attr.class "w-full h-full object-cover",

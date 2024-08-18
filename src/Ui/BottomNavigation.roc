@@ -19,7 +19,7 @@ viewAction = \input ->
         [
             Attr.classList [
                 if input.selected then
-                    "text-blue-600"
+                    "text-blue-500"
                 else
                     "",
                 "flex-1 h-full flex flex-col text-xs gap- items-center justify-center",
