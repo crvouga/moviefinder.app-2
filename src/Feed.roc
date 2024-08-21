@@ -244,7 +244,15 @@ viewFeedItem = \feedItem ->
         [
             App.Link.view
                 {
-                    route: Media (Details { mediaId: feedItem.media.mediaId, mediaType: feedItem.media.mediaType }),
+                    route: Media
+                        (
+                            Details {
+                                mediaId: feedItem.media.mediaId,
+                                mediaType: feedItem.media.mediaType,
+                                titleLen: feedItem.media.mediaTitle |> Str.toUtf8 |> List.len,
+                                descriptionLen: feedItem.media.mediaDescription |> Str.toUtf8 |> List.len,
+                            }
+                        ),
                     label: "View details",
                     attrs: [
                         Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center relative",

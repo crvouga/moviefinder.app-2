@@ -7,12 +7,10 @@ import pf.Task
 import Ctx
 import Html
 import Html.Attr as Attr
-import Media.Details.Route
+import Media.Details.Route exposing [DetailsQuery, Route]
 import Media
 import Ui.Image
 import Hx
-import MediaId exposing [MediaId]
-import MediaType exposing [MediaType]
 import Ui.Typography
 import ImageSet
 import Ui.Spinner
@@ -22,7 +20,7 @@ import App.TopBar
 import Ui.Icon
 import MediaVideo
 
-routeHx : Ctx.Ctx, Media.Details.Route.Route -> Task.Task Response.Response _
+routeHx : Ctx.Ctx, Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
         Details mediaQuery ->
@@ -44,9 +42,7 @@ routeHx = \ctx, route ->
         Unknown ->
             (Feed Feed) |> Response.redirect |> Task.ok
 
-MediaQuery : { mediaId : MediaId, mediaType : MediaType }
-
-Details : [Loading MediaQuery, Loaded Media.Media]
+Details : [Loading DetailsQuery, Loaded Media.Media]
 
 viewDetails : Details -> Html.Node
 viewDetails = \details ->
@@ -61,7 +57,7 @@ viewDetails = \details ->
         [
             App.TopBar.view {
                 back: Feed Feed,
-                title: toTitle details,
+                title: toPageTitle details,
             },
             Html.div
                 [
@@ -134,17 +130,23 @@ viewDetailsVideoList = \details ->
         Loaded media -> viewVideoList media
         Loading _ -> Html.fragment []
 
+toPageTitle : Details -> Str
+toPageTitle = \details ->
+    when details is
+        Loaded media -> media.mediaTitle
+        Loading _ -> ""
+
 toTitle : Details -> Str
 toTitle = \details ->
     when details is
         Loaded media -> media.mediaTitle
-        Loading _ -> "Lorem ipsum"
+        Loading query -> Str.repeat "a " (query.titleLen // 2)
 
 toDescription : Details -> Str
 toDescription = \details ->
     when details is
         Loaded media -> media.mediaDescription
-        Loading _ -> "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum mi nec, ultricies nunc. Nullam nec purus feugiat, vestibulum mi nec, ultricies nunc. Nullam nec purus feugiat, vestibulum mi nec, ultricies nunc."
+        Loading query -> Str.repeat "a " (query.descriptionLen // 2)
 
 viewDetailsVideoPlayers : Details -> Html.Node
 viewDetailsVideoPlayers = \details ->

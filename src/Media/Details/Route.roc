@@ -1,41 +1,50 @@
-module [Route, encode, decode]
+module [Route, encode, decode, DetailsQuery]
 
 import MediaId exposing [MediaId]
 import MediaType exposing [MediaType]
 import Url exposing [Url]
 import MediaVideo exposing [MediaVideo]
 
-MediaQuery : { mediaType : MediaType, mediaId : MediaId }
+DetailsQuery : {
+    mediaType : MediaType,
+    mediaId : MediaId,
+    titleLen : U64,
+    descriptionLen : U64,
+}
 
-appendParamsMediaQuery : Url, MediaQuery -> Url
-appendParamsMediaQuery = \url, { mediaType, mediaId } ->
+appendParamsDetailsQuery : Url, DetailsQuery -> Url
+appendParamsDetailsQuery = \url, { mediaType, mediaId, titleLen, descriptionLen } ->
     url
     |> Url.appendParam "mediaType" (MediaType.toStr mediaType)
     |> Url.appendParam "mediaId" (MediaId.toStr mediaId)
+    |> Url.appendParam "titleLen" (Num.toStr titleLen)
+    |> Url.appendParam "descriptionLen" (Num.toStr descriptionLen)
 
-getParamsMediaQuery : Url -> MediaQuery
-getParamsMediaQuery = \url ->
+getParamsDetailsQuery : Url -> DetailsQuery
+getParamsDetailsQuery = \url ->
     queryParams = Url.queryParams url
     mediaTypeStr = queryParams |> Dict.get "mediaType" |> Result.withDefault ""
     mediaIdStr = queryParams |> Dict.get "mediaId" |> Result.withDefault ""
     mediaType = mediaTypeStr |> MediaType.fromStr
     mediaId = mediaIdStr |> MediaId.fromStr
-    { mediaType, mediaId }
+    titleLen = queryParams |> Dict.get "titleLen" |> Result.withDefault "" |> Str.toU64 |> Result.withDefault 12
+    descriptionLen = queryParams |> Dict.get "descriptionLen" |> Result.withDefault "" |> Str.toU64 |> Result.withDefault 144
+    { mediaType, mediaId, titleLen, descriptionLen }
 
-Route : [Details MediaQuery, DetailsLoad MediaQuery, Unknown, Video MediaVideo]
+Route : [Details DetailsQuery, DetailsLoad DetailsQuery, Unknown, Video MediaVideo]
 
 encode : Route -> Url
 encode = \route ->
     when route is
-        DetailsLoad mediaQuery ->
+        DetailsLoad detailsQuery ->
             "/media/details-load"
             |> Url.fromStr
-            |> appendParamsMediaQuery mediaQuery
+            |> appendParamsDetailsQuery detailsQuery
 
-        Details mediaQuery ->
+        Details detailsQuery ->
             "/media/details"
             |> Url.fromStr
-            |> appendParamsMediaQuery mediaQuery
+            |> appendParamsDetailsQuery detailsQuery
 
         Video mediaVideo ->
             "/media/video"
@@ -49,12 +58,12 @@ decode : Url -> Route
 decode = \url ->
     when Url.path url is
         "/media/details-load" ->
-            mediaQuery = getParamsMediaQuery url
-            DetailsLoad mediaQuery
+            detailsQuery = getParamsDetailsQuery url
+            DetailsLoad detailsQuery
 
         "/media/details" ->
-            mediaQuery = getParamsMediaQuery url
-            Details mediaQuery
+            detailsQuery = getParamsDetailsQuery url
+            Details detailsQuery
 
         "/media/video" ->
             mediaVideo = MediaVideo.fromUrl url
