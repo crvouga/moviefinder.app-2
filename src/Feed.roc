@@ -247,14 +247,30 @@ viewFeedItem = \feedItem ->
                     route: Media (Details { mediaId: feedItem.media.mediaId, mediaType: feedItem.media.mediaType }),
                     label: "View details",
                     attrs: [
-                        Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center",
+                        Attr.class "w-full h-full min-h-full flex-1 flex items-center justify-center relative",
                     ],
                 }
                 [
-                    Ui.Image.view [
-                        Attr.class "w-full h-full object-cover",
-                        Attr.src (ImageSet.highestRes feedItem.media.mediaPoster),
-                    ],
+                    Html.div
+                        [
+                            Attr.class "w-full h-full",
+                            Hx.loadingClassAdd "opacity-50",
+                        ]
+                        [
+                            Ui.Image.view [
+                                Attr.class "w-full h-full object-cover",
+                                Attr.src (ImageSet.highestRes feedItem.media.mediaPoster),
+
+                            ],
+                        ],
+                    Html.div
+                        [
+                            Attr.class "absolute inset-0 pointer-events-none flex items-center justify-center opacity-0",
+                            Hx.loadingClassRemove "opacity-0",
+                        ]
+                        [
+                            Ui.Spinner.view {},
+                        ],
                 ],
         ]
 

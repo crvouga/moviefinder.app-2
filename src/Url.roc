@@ -21,7 +21,8 @@ queryParams = \@Url url -> UrlLib.queryParams url
 
 toPaths : Url -> List Str
 toPaths = \url ->
-    Url.toStr url
+    url
+    |> Url.toStr
     |> Str.split "?"
     |> List.first
     |> Result.withDefault ""

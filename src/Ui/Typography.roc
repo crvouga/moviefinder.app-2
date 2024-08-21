@@ -19,12 +19,16 @@ variantToHtmlTag = \variant ->
         Overline -> "span"
         Subtitle -> "span"
 
-view : { text : Str, variant ? Variant, class ? Str } -> Html.Node
-view = \{ text, variant ? Body, class ? "" } ->
-    (Html.element (variantToHtmlTag variant))
-        [
-            Attr.classList [class],
-        ]
-        [
-            Html.text text,
-        ]
+view : { text : Str, variant ? Variant, class ? Str, skeleton ? Bool } -> Html.Node
+view = \{ text, variant ? Body, class ? "", skeleton ? Bool.false } ->
+    if skeleton then
+        Html.div
+            [
+                Attr.class "text-transparent w-full flex items-center justify-center",
+            ]
+            [
+                (Html.element (variantToHtmlTag variant)) [Attr.classList [class, "bg-neutral-700 animate-pulse rounded-sm"]] [Html.text text],
+            ]
+    else
+        (Html.element (variantToHtmlTag variant)) [Attr.classList [class]] [Html.text text]
+

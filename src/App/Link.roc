@@ -15,6 +15,7 @@ view = \{ route, label, attrs ? [] }, children ->
                 (Html.Attr.attribute "aria-label") label,
                 Hx.target "#app",
                 Hx.swap InnerHtml,
+                Hx.loadingPath (Route.encode route),
                 Html.Attr.href (Url.toStr (Route.encode route)),
             ]
         )

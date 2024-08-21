@@ -26,14 +26,14 @@ routeHx : Ctx.Ctx, Media.Details.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
         Details mediaQuery ->
-            viewDetailsLoading mediaQuery |> Response.html |> Task.ok
+            Loading mediaQuery |> viewDetails |> Response.html |> Task.ok
 
         DetailsLoad mediaQuery ->
             queried <- ctx.mediaDb.findById mediaQuery.mediaId mediaQuery.mediaType |> Task.attempt
 
             when queried is
                 Ok media ->
-                    viewDetails media |> Response.html |> Task.ok
+                    Loaded media |> viewDetails |> Response.html |> Task.ok
 
                 Err NotFound ->
                     (Feed Feed) |> Response.redirect |> Task.ok
@@ -44,43 +44,24 @@ routeHx = \ctx, route ->
         Unknown ->
             (Feed Feed) |> Response.redirect |> Task.ok
 
-viewDetailsLoading : { mediaId : MediaId, mediaType : MediaType } -> Html.Node
-viewDetailsLoading = \mediaQuery -> Html.div
-        [
-            Attr.class "w-full h-full flex flex-col items-center justify-center",
-            Hx.swap OuterHtml,
-            Hx.trigger Load,
-            Hx.get (Media.Details.Route.encode (DetailsLoad mediaQuery)),
-        ]
-        [
-            App.TopBar.view {
-                back: Feed Feed,
-                title: "",
-            },
-            Ui.Image.view [
-                Attr.src " ",
-                Attr.alt " ",
-                Attr.class "w-full aspect-video",
-            ],
-            Html.div
-                [
-                    Attr.class "w-full flex flex-1 flex-col items-center justify-start p-8",
-                ]
-                [
-                    Ui.Spinner.view {},
-                ],
-        ]
+MediaQuery : { mediaId : MediaId, mediaType : MediaType }
 
-viewDetails : Media.Media -> Html.Node
-viewDetails = \media ->
+Details : [Loading MediaQuery, Loaded Media.Media]
+
+viewDetails : Details -> Html.Node
+viewDetails = \details ->
     Html.div
-        [
-            Attr.class "w-full h-full flex flex-col overflow-hidden",
-        ]
+        (
+            List.concat
+                [
+                    Attr.class "w-full h-full flex flex-col overflow-hidden",
+                ]
+                (toDetailsAttrs details)
+        )
         [
             App.TopBar.view {
                 back: Feed Feed,
-                title: media.mediaTitle,
+                title: toTitle details,
             },
             Html.div
                 [
@@ -88,14 +69,14 @@ viewDetails = \media ->
                     X.data jsData,
                 ]
                 [
-                    viewVideoPlayers media,
+                    viewDetailsVideoPlayers details,
                     Html.div
                         [
                             Attr.class "w-full h-full flex flex-col overflow-y-scroll",
                         ]
                         [
                             Ui.Image.view [
-                                Attr.src (ImageSet.highestRes media.mediaBackdrop),
+                                Attr.src (viewDetailsImageSrc details),
                                 Attr.alt " ",
                                 Attr.class "w-full aspect-video shrink-0",
                             ],
@@ -106,19 +87,70 @@ viewDetails = \media ->
                                 [
                                     Ui.Typography.view {
                                         variant: H1,
-                                        text: media.mediaTitle,
+                                        text: toTitle details,
                                         class: "text-center text-3xl font-bold",
+                                        skeleton: skeleton details,
                                     },
                                     Ui.Typography.view {
                                         variant: Body,
-                                        text: media.mediaDescription,
+                                        text: toDescription details,
                                         class: "text-center text-sm opacity-80",
+                                        skeleton: skeleton details,
                                     },
                                 ],
-                            viewVideoList media,
+                            viewDetailsVideoList details,
                         ],
                 ],
         ]
+
+skeleton : Details -> Bool
+skeleton = \details ->
+    when details is
+        Loading _ -> Bool.true
+        Loaded _ -> Bool.false
+
+toDetailsAttrs : Details -> List Attr.Attribute
+toDetailsAttrs = \details ->
+    when details is
+        Loading mediaQuery ->
+            [
+                Hx.swap OuterHtml,
+                Hx.trigger Load,
+                Hx.get (Media.Details.Route.encode (DetailsLoad mediaQuery)),
+            ]
+
+        Loaded _ ->
+            []
+
+viewDetailsImageSrc : Details -> Str
+viewDetailsImageSrc = \details ->
+    when details is
+        Loaded media -> ImageSet.highestRes media.mediaBackdrop
+        Loading _ -> ""
+
+viewDetailsVideoList : Details -> Html.Node
+viewDetailsVideoList = \details ->
+    when details is
+        Loaded media -> viewVideoList media
+        Loading _ -> Html.fragment []
+
+toTitle : Details -> Str
+toTitle = \details ->
+    when details is
+        Loaded media -> media.mediaTitle
+        Loading _ -> "Lorem ipsum"
+
+toDescription : Details -> Str
+toDescription = \details ->
+    when details is
+        Loaded media -> media.mediaDescription
+        Loading _ -> "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat, vestibulum mi nec, ultricies nunc. Nullam nec purus feugiat, vestibulum mi nec, ultricies nunc. Nullam nec purus feugiat, vestibulum mi nec, ultricies nunc."
+
+viewDetailsVideoPlayers : Details -> Html.Node
+viewDetailsVideoPlayers = \details ->
+    when details is
+        Loaded media -> viewVideoPlayers media
+        Loading _ -> Html.fragment []
 
 jsRefVideoIframeId : MediaVideo.MediaVideo -> Str
 jsRefVideoIframeId = \video ->
