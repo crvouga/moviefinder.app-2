@@ -28,6 +28,11 @@ routeHx = \ctx, route ->
         ControlsLoad ->
             Response.redirect (Feed Feed) |> Task.ok
 
+        ClickedChip item ->
+            when item is
+                ItemGenre genre ->
+                    Response.redirect (Feed Feed) |> Task.ok
+
         Unknown ->
             Response.redirect (Feed Feed) |> Task.ok
 

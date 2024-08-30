@@ -45,6 +45,7 @@ routeHx = \ctx, route ->
             fallback = {
                 feedId: "some-feed-id",
                 activeIndex: 0,
+                genres: [],
             }
 
             feed = got |> Result.withDefault fallback
@@ -76,6 +77,7 @@ routeHx = \ctx, route ->
             fallback = {
                 feedId: "some-feed-id",
                 activeIndex: 0,
+                genres: [],
             }
 
             feed = got |> Result.withDefault fallback
@@ -110,6 +112,7 @@ routeHx = \ctx, route ->
             fallback = {
                 feedId: "some-feed-id",
                 activeIndex: payload.index - 1,
+                genres: [],
             }
 
             feed = got |> Result.withDefault fallback

@@ -1,0 +1,16 @@
+module [Item, itemGenre, encode]
+
+import Media.Genre exposing [Genre]
+import Json
+import Base64
+
+Item : [ItemGenre Genre]
+
+itemGenre : Genre -> Item
+itemGenre = \genre -> ItemGenre genre
+
+
+encode : Item -> Str
+encode = \item ->
+    
+
