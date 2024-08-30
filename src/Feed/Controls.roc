@@ -12,6 +12,7 @@ import Ui.Icon
 import Html.Attr as Attr
 import Ui.IconButton
 import Media.Genre exposing [Genre]
+import Ui.Chip
 import pf.Task
 
 routeHx : Ctx.Ctx, Feed.Controls.Route.Route -> Task.Task Response.Response _
@@ -40,10 +41,10 @@ viewTopBar =
             Html.div [] [],
             Html.div
                 [
-                    Attr.class "pr-4",
-
+                    Attr.class "px-2 w-full flex items-center justify-center",
                 ]
                 [
+                    Html.div [Attr.class "flex-1"] [],
                     Ui.IconButton.a {
                         icon: Ui.Icon.xMark {},
                         href: Feed.Route.encode (Feed),
@@ -66,5 +67,5 @@ viewControls : List Genre -> Html.Node
 viewControls = \genres ->
     Html.div [] [
         viewTopBar,
-        Html.fragment (List.map genres \genre -> Html.text genre.genreName),
+        Html.div [Attr.class "flex gap-2 flex-wrap items-center justify-start p-4"] (List.map genres \genre -> Ui.Chip.view { label: genre.genreName, selected: Bool.true }),
     ]
