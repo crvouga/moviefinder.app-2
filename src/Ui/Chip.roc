@@ -4,12 +4,13 @@ import Html
 import Html.Attr as Attr
 
 view : { label : Str, selected ? Bool } -> Html.Node
-view = \{ label, selected ? Bool.false } -> Html.div
+view = \{ label, selected ? Bool.false } ->
+    Html.button
         [
             Attr.classList [
-                "px-2 py-1 rounded-full w-fit font-bold border",
+                "px-2 py-1 rounded-full w-fit font-bold border hover:bg-neutral-800 hover:text-white",
                 if selected then
-                    "bg-primary-200 text-white"
+                    "text-white"
                 else
                     "bg-transparent text-black",
             ],

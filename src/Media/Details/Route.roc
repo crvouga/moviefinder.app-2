@@ -56,16 +56,16 @@ encode = \route ->
 
 decode : Url -> Route
 decode = \url ->
-    when Url.path url is
-        "/media/details-load" ->
+    when Url.toPaths url is
+        ["/media", "/details-load"] ->
             detailsQuery = getParamsDetailsQuery url
             DetailsLoad detailsQuery
 
-        "/media/details" ->
+        ["/media", "/details"] ->
             detailsQuery = getParamsDetailsQuery url
             Details detailsQuery
 
-        "/media/video" ->
+        ["/media", "/video"] ->
             mediaVideo = MediaVideo.fromUrl url
             Video mediaVideo
 

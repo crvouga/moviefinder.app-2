@@ -22,11 +22,8 @@ import Logger
 import Ui.Icon
 import Ui.IconButton
 import Url
-import Feed.Controls
+import Feed.Controls.Router
 import Feed.Feed exposing [Feed]
-# import pf.Sleep
-# import Pagination
-# import X
 
 FeedItem : {
     index : U64,
@@ -104,7 +101,7 @@ routeHx = \ctx, route ->
             |> Task.ok
 
         Controls r ->
-            Feed.Controls.routeHx ctx r
+            Feed.Controls.Router.routeHx ctx r
 
         ChangedSlide payload ->
             got <- ctx.feedDb.get "some-feed-id" |> Task.attempt

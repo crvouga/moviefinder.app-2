@@ -8,16 +8,16 @@ import pf.Http
 import pf.Env
 import Request
 import Response
-import Auth.Login
+import Auth.Router
 import Hx
 import Ctx
 import Ctx.Impl
 import Route
-import Account
-import Feed
+import Account.Router
+import Feed.Router
 import App.Document
 import Logger
-import Media.Details
+import Media.Details.Router
 
 main : Http.Request -> Task.Task Http.Response []
 main = \httpReq ->
@@ -42,16 +42,16 @@ routeHx : Ctx.Ctx, Request.Request -> Task.Task Response.Response _
 routeHx = \ctx, req ->
     when req.route is
         Login r ->
-            Auth.Login.routeHx ctx r
+            Auth.Router.routeHx ctx r
 
         Feed r ->
-            Feed.routeHx ctx r
+            Feed.Router.routeHx ctx r
 
         Account r ->
-            Account.routeHx ctx r
+            Account.Router.routeHx ctx r
 
         Media r ->
-            Media.Details.routeHx ctx r
+            Media.Details.Router.routeHx ctx r
 
         Index | RobotsTxt ->
             Route.init |> Response.redirect |> Task.ok
