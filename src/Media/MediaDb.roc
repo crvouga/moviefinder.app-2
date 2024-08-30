@@ -3,9 +3,9 @@ module [MediaDb, MediaQuery, MediaField, FindById, Find]
 import pf.Task exposing [Task]
 import Query exposing [Query]
 import Paginated exposing [Paginated]
-import Media exposing [Media]
-import MediaId exposing [MediaId]
-import MediaType exposing [MediaType]
+import Media.Media exposing [Media]
+import Media.MediaId exposing [MediaId]
+import Media.MediaType exposing [MediaType]
 
 MediaField : [MediaId, MediaType]
 

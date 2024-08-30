@@ -4,13 +4,13 @@ import pf.Task exposing [Task]
 import pf.Http
 import Pagination
 import Media.MediaDb exposing [MediaDb, Find, FindById, MediaQuery]
-import Media exposing [Media]
+import Media.Media exposing [Media]
 import Logger
 import Json
 import ImageSet
-import MediaId
+import Media.MediaId as MediaId
 import Tmdb
-import MediaVideo
+import Media.MediaVideo as MediaVideo
 import Url
 import json.OptionOrNull exposing [OptionOrNull]
 # import pf.Stdout

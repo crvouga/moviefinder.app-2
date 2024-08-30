@@ -1,9 +1,9 @@
 module [Route, encode, decode, DetailsQuery]
 
-import MediaId exposing [MediaId]
-import MediaType exposing [MediaType]
+import Media.MediaId as MediaId exposing [MediaId]
+import Media.MediaType as MediaType exposing [MediaType]
+import Media.MediaVideo as MediaVideo exposing [MediaVideo]
 import Url exposing [Url]
-import MediaVideo exposing [MediaVideo]
 
 DetailsQuery : {
     mediaType : MediaType,

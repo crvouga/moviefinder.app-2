@@ -8,7 +8,8 @@ import Ctx
 import Html
 import Html.Attr as Attr
 import Media.Details.Route exposing [DetailsQuery, Route]
-import Media
+import Media.Media as Media
+import Media.MediaVideo as MediaVideo
 import Ui.Image
 import Hx
 import Ui.Typography
@@ -18,7 +19,6 @@ import X
 import Ui.Button
 import App.TopBar
 import Ui.Icon
-import MediaVideo
 
 routeHx : Ctx.Ctx, Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->

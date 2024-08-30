@@ -1,9 +1,9 @@
 module [Media]
 
 import ImageSet
-import MediaId
-import MediaType
-import MediaVideo
+import Media.MediaId as MediaId
+import Media.MediaType as MediaType
+import Media.MediaVideo as MediaVideo
 
 Media : {
     mediaId : MediaId.MediaId,
