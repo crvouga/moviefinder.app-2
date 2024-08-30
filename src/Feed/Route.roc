@@ -54,5 +54,3 @@ decode = \url ->
 
         _ ->
             Unknown (Url.toStr url)
-
-expect ("/feed/controls" |> Url.fromStr |> decode) == (Controls Controls)

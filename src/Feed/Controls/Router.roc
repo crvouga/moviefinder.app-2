@@ -30,7 +30,7 @@ routeHx = \ctx, route ->
 
         ClickedChip item ->
             when item is
-                ItemGenre genre ->
+                ItemGenre _ ->
                     Response.redirect (Feed Feed) |> Task.ok
 
         Unknown ->

@@ -1,6 +1,6 @@
 module [Route, encode, decode]
 import Url exposing [Url]
-import Feed.Controls.Item exposing [Item]
+import Feed.Controls.Item as Item exposing [Item]
 
 Route : [Controls, ControlsLoad, Unknown, ClickedChip Item]
 
@@ -12,7 +12,8 @@ encode = \route ->
         ClickedChip item ->
             "/feed/controls/clicked-chip"
             |> Url.fromStr
-            |> Url.appendParam "item" (Item.toUrlSafeStr item)
+            |> Url.appendParam "item" (Item.encode item)
+
         Unknown -> Url.fromStr "/"
 
 decode : Url -> Route
