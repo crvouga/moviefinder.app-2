@@ -1,6 +1,5 @@
 module [init, Config, getDiscoverMovie]
 
-import pf.Task exposing [Task]
 import pf.Http
 import Pagination
 import Media.MediaDb exposing [MediaDb, Find, FindById, MediaQuery]

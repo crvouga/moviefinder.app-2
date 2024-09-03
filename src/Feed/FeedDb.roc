@@ -1,7 +1,5 @@
 module [FeedDb, Get, Put]
 
-import pf.Task exposing [Task]
-
 import Feed.Feed exposing [Feed]
 import Feed.FeedId exposing [FeedId]
 

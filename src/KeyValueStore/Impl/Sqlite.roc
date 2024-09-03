@@ -2,7 +2,6 @@
 # https://roc-lang.github.io/basic-webserver/SQLite3/
 module [init, Config]
 
-import pf.Task
 import pf.SQLite3
 import KeyValueStore
 import Logger exposing [Logger]

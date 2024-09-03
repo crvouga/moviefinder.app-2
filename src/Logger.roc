@@ -2,7 +2,6 @@ module [init, Logger, info]
 
 import pf.Stdout
 import pf.Utc
-import pf.Task
 
 Impl : [Std]
 

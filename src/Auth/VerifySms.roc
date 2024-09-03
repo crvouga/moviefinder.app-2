@@ -1,6 +1,5 @@
 module [VerifySms, SendCode, VerifyCode]
 
-import pf.Task exposing [Task]
 import PhoneNumber exposing [PhoneNumber]
 import Auth.VerifyCodeErr exposing [VerifyCodeErr]
 

@@ -1,6 +1,5 @@
 module [init, Config]
 
-import pf.Task exposing [Task]
 import pf.Http
 import Media.GenreDb exposing [GenreDb, All]
 import json.OptionOrNull exposing [OptionOrNull]

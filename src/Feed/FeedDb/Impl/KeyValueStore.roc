@@ -2,7 +2,7 @@ module [Config, init]
 
 import KeyValueStore exposing [KeyValueStore]
 import Feed.FeedDb exposing [FeedDb, Get, Put]
-import pf.Task
+
 import Feed.Feed as Feed
 
 Config : {

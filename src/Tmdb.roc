@@ -1,6 +1,5 @@
 module [baseUrl, toRequest, toBaseHeaders, TmdbConfig, getTmdbConfig, pageSize, toPosterImageSet, toBackdropImageSet]
 
-import pf.Task exposing [Task]
 import pf.Http
 import ImageSet exposing [ImageSet]
 import Json

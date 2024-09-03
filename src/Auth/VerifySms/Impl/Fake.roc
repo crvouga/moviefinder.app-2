@@ -1,6 +1,5 @@
 module [Config, init]
 
-import pf.Task exposing [Task]
 import pf.Sleep
 import Logger
 # import PhoneNumber

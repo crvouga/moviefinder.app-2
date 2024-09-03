@@ -7,7 +7,6 @@ import Html.Attr as Attr
 import Ui.Button
 import Ui.Icon as Icon
 import Response
-import pf.Task
 import Ctx
 import Account.Route
 import Ui.Typography

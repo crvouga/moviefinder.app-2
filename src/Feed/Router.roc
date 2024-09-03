@@ -6,7 +6,7 @@ module [
 import Html
 import Html.Attr as Attr
 import Response
-import pf.Task
+
 import Ctx
 import Feed.Route
 import Media.Media as Media

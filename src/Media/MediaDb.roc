@@ -1,6 +1,5 @@
 module [MediaDb, MediaQuery, MediaField, FindById, Find]
 
-import pf.Task exposing [Task]
 import Query exposing [Query]
 import Paginated exposing [Paginated]
 import Media.Media exposing [Media]

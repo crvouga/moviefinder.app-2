@@ -3,7 +3,7 @@ module [
 ]
 
 import Response
-import pf.Task
+
 import Html
 import Feed.Controls.Route
 import Feed.Route
@@ -12,7 +12,7 @@ import Ui.Icon
 import Html.Attr as Attr
 import Ui.IconButton
 import Ui.Chip
-import pf.Task
+
 import Feed.Controls.Item as Item exposing [Item]
 import Hx
 

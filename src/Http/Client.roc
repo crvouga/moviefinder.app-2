@@ -2,7 +2,7 @@ module [
     get,
     HttpClient,
 ]
-import pf.Task exposing [Task]
+
 import pf.Http exposing [send, defaultRequest]
 
 ## Try to perform an HTTP get request and convert (decode) the received bytes into a Roc type.
