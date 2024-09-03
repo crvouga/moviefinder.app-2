@@ -3,7 +3,7 @@ FROM roclang/nightly-debian-bookworm as builder
 # Copy the source code
 COPY ./src /src
 # Build the roc app
-RUN ["roc", "build", "--optimize", "/src/Main.roc"]
+RUN ["roc", "build", "/src/Main.roc"]
 # Check if the binary is present
 RUN ["ls", "/src/Main"]
 
