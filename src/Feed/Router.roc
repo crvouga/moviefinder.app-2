@@ -24,6 +24,7 @@ import Ui.IconButton
 import Url
 import Feed.Controls.Router
 import Feed.Feed exposing [Feed]
+import Feed.FeedId as FeedId exposing [FeedId]
 
 FeedItem : {
     index : U64,
@@ -36,14 +37,16 @@ routeHx : Ctx.Ctx, Feed.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
         Feed ->
-            viewFeed |> Response.html |> Task.ok
+            feedId : FeedId
+            feedId = FeedId.fromStr "123"
+            viewFeed { feedId } |> Response.html |> Task.ok
 
         LoadNext ->
-            got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
+            got <- ctx.feedDb.get "123" |> Task.attempt
 
             fallback : Feed
             fallback = {
-                feedId: "some-feed-id",
+                feedId: "123",
                 activeIndex: 0,
                 genres: [],
             }
@@ -71,11 +74,11 @@ routeHx = \ctx, route ->
             |> Task.ok
 
         LoadPrev ->
-            got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
+            got <- ctx.feedDb.get "123" |> Task.attempt
 
             fallback : Feed
             fallback = {
-                feedId: "some-feed-id",
+                feedId: "123",
                 activeIndex: 0,
                 genres: [],
             }
@@ -106,11 +109,11 @@ routeHx = \ctx, route ->
             Feed.Controls.Router.routeHx ctx r
 
         ChangedSlide payload ->
-            got <- ctx.feedDb.get "some-feed-id" |> Task.attempt
+            got <- ctx.feedDb.get "123" |> Task.attempt
 
             fallback : Feed
             fallback = {
-                feedId: "some-feed-id",
+                feedId: "123",
                 activeIndex: payload.index - 1,
                 genres: [],
             }
@@ -163,11 +166,12 @@ jsWatchSlideChange =
         const endpoint = endpointTemplate.replace('0', feedIndex)
         htmx.ajax('POST', endpoint, { swap: 'none' })
         window.history.pushState({}, '', `/feed?activeIndex=${feedIndex}`)
+        window.dispatchEvent(new PopStateEvent('popstate'))        
     })
     """
 
-viewFeed : Html.Node
-viewFeed =
+viewFeed : { feedId : FeedId } -> Html.Node
+viewFeed = \{ feedId } ->
     Html.div
         [
             Attr.class "w-full h-full flex flex-col overflow-hidden",
@@ -187,7 +191,7 @@ viewFeed =
                         ],
                     Ui.IconButton.a {
                         icon: Ui.Icon.adjustmentsHorizontal {},
-                        href: Feed.Route.encode (Controls Controls),
+                        href: Feed.Route.encode (Controls (Controls { feedId })),
                         target: "#app",
                         label: "Controls",
                     },

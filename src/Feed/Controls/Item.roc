@@ -1,10 +1,15 @@
-module [Item, itemGenre, encode]
+module [Item, itemGenre, encode, chipLabel]
 
 import Media.Genre exposing [Genre]
 import Json
 import Base64
 
 Item : [ItemGenre Genre]
+
+chipLabel : Item -> Str
+chipLabel = \item ->
+    when item is
+        ItemGenre genre -> genre.genreName
 
 itemGenre : Genre -> Item
 itemGenre = \genre -> ItemGenre genre

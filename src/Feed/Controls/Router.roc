@@ -11,19 +11,23 @@ import Ctx
 import Ui.Icon
 import Html.Attr as Attr
 import Ui.IconButton
-import Media.Genre exposing [Genre]
 import Ui.Chip
 import pf.Task
+import Feed.Controls.Item as Item exposing [Item]
+import Hx
 
 routeHx : Ctx.Ctx, Feed.Controls.Route.Route -> Task.Task Response.Response _
 routeHx = \ctx, route ->
     when route is
-        Controls ->
+        Controls _ ->
             allGenres <- ctx.genreDb.all {} |> Task.attempt
 
             when allGenres is
                 Err _ -> viewControlsErr |> Response.html |> Task.ok
-                Ok genres -> viewControls genres |> Response.html |> Task.ok
+                Ok genres ->
+                    items : List Item
+                    items = List.map genres ItemGenre
+                    viewControls items |> Response.html |> Task.ok
 
         ControlsLoad ->
             Response.redirect (Feed Feed) |> Task.ok
@@ -68,9 +72,19 @@ viewControlsErr =
         ],
     ]
 
-viewControls : List Genre -> Html.Node
-viewControls = \genres ->
+viewControls : List Item -> Html.Node
+viewControls = \items ->
     Html.div [] [
         viewTopBar,
-        Html.div [Attr.class "flex gap-2 flex-wrap items-center justify-start p-4"] (List.map genres \genre -> Ui.Chip.view { label: genre.genreName, selected: Bool.true }),
+        Html.div
+            [Attr.class "flex gap-2 flex-wrap items-center justify-start p-4"]
+            (
+                List.map items \item -> Ui.Chip.view
+                        {
+                            label: Item.chipLabel item,
+                            selected: Bool.true,
+
+                        }
+                        [Hx.post (Feed.Controls.Route.encode (ClickedChip item))]
+            ),
     ]
