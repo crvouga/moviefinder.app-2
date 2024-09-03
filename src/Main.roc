@@ -1,4 +1,4 @@
-app [main] {
+app [Model, server] {
     pf: platform "https://github.com/roc-lang/basic-webserver/releases/download/0.9.0/taU2jQuBf-wB8EJb0hAkrYLYOGacUU5Y9reiHG45IY4.tar.br",
     json: "https://github.com/lukewilliamboswell/roc-json/releases/download/0.10.0/KbIfTNbxShRX1A1FgXei1SpO5Jn8sgP6HP6PXbi-xyA.tar.br",
     base64: "https://github.com/adomurad/roc-base64/releases/download/v0.2.0/hdowh25hurV_dACKR6IMJs-Up3hgAiokhYtRRNSn88k.tar.br",
@@ -20,8 +20,12 @@ import App.Document
 import Logger
 import Media.Details.Router
 
-main : Http.Request -> Task.Task Http.Response []
-main = \httpReq ->
+Model : {}
+
+server = { init: Task.ok {}, respond }
+
+respond : Http.Request, Model -> Task Http.Response [ServerErr Str]_
+respond = \httpReq, _ ->
     tmdbApiReadAccessToken <- Env.var "TMDB_API_READ_ACCESS_TOKEN" |> Task.onErr (\_ -> Task.ok "") |> Task.await
     databaseUrl <- Env.var "DATABASE_URL" |> Task.onErr (\_ -> Task.ok "") |> Task.await
 
